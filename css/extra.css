@@ -3646,3 +3646,229 @@ body:has(#productsGridInventory) .cart-panel {
         gap: 4px;
     }
 }
+
+/* Final admin/public design override */
+html.role-admin body:not(.client-store) {
+    background: #f0f0f0 !important;
+    color: #263238 !important;
+    padding: 18px !important;
+}
+
+html.role-admin body:not(.client-store) .app-layout {
+    background: #fafafa !important;
+    border-radius: 28px !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08) !important;
+    gap: 0 !important;
+    height: calc(100vh - 36px) !important;
+    margin: 0 auto !important;
+    max-width: 1480px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .top-navbar {
+    background: #1b3a2d !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #fff !important;
+    flex: 0 0 250px !important;
+    height: 100% !important;
+    max-width: 250px !important;
+    padding: 24px 18px !important;
+    width: 250px !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-brand {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    padding: 0 6px 22px !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-logo {
+    background: #2e7d32 !important;
+    color: #fff !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-title {
+    color: #fff !important;
+    font-size: 1.22rem !important;
+    letter-spacing: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .company-tag {
+    color: rgba(255, 255, 255, 0.72) !important;
+    display: block !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-nav {
+    background: transparent !important;
+    border-radius: 0 !important;
+    gap: 4px !important;
+    padding: 18px 0 !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-link {
+    border-left: 4px solid transparent !important;
+    border-radius: 0 12px 12px 0 !important;
+    color: rgba(255, 255, 255, 0.82) !important;
+    min-height: 48px !important;
+    padding: 0 14px 0 18px !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-link:hover,
+html.role-admin body:not(.client-store) .navbar-link.active {
+    background: rgba(255, 255, 255, 0.11) !important;
+    border-left-color: #4caf50 !important;
+    color: #fff !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-link > span,
+html.role-admin body:not(.client-store) .navbar-link.active > span {
+    color: inherit !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+}
+
+html.role-admin body:not(.client-store) .navbar-actions {
+    background: rgba(0, 0, 0, 0.18) !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+}
+
+html.role-admin body:not(.client-store) .main-area {
+    background: #f8f9fa !important;
+    overflow-y: auto !important;
+    padding: 24px !important;
+}
+
+html.role-admin body:not(.client-store) .products-section,
+html.role-admin body:not(.client-store) .page-surface,
+html.role-admin body:not(.client-store) #mainAreaStats .products-section {
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .commandes-hero,
+html.role-admin body:not(.client-store) .finance-hero,
+html.role-admin body:not(.client-store) .card,
+html.role-admin body:not(.client-store) .finance-panel,
+html.role-admin body:not(.client-store) .stock-overview,
+html.role-admin body:not(.client-store) .add-lot-card,
+html.role-admin body:not(.client-store) .purchase-invoices-panel {
+    background: #fff !important;
+    border: 1px solid #e7ece8 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.role-admin body:not(.client-store) .stats-grid-extended,
+html.role-admin body:not(.client-store) .finance-stats,
+html.role-admin body:not(.client-store) .achats-summary,
+html.role-admin body:not(.client-store) .summary-grid {
+    display: grid !important;
+    gap: 18px !important;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+}
+
+html.role-admin body:not(.client-store) .stat-card-extended,
+html.role-admin body:not(.client-store) .finance-stat,
+html.role-admin body:not(.client-store) .summary-card {
+    background: #fff !important;
+    border: 1px solid #e7ece8 !important;
+    border-left: 4px solid #2e7d32 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    min-height: 112px !important;
+    padding: 20px !important;
+}
+
+html.role-admin body:not(.client-store) .stat-value,
+html.role-admin body:not(.client-store) .finance-stat strong,
+html.role-admin body:not(.client-store) .summary-card .value {
+    color: #263238 !important;
+    font-size: 1.55rem !important;
+    font-weight: 900 !important;
+}
+
+html.role-admin body:not(.client-store) .page-eyebrow,
+html.role-admin body:not(.client-store) .stat-label,
+html.role-admin body:not(.client-store) .finance-stat span {
+    color: #6c7a72 !important;
+    font-size: 0.78rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+}
+
+html.role-admin body:not(.client-store) .data-table thead th,
+html.role-admin body:not(.client-store) table thead th,
+html.role-admin body:not(.client-store) .user-perms-table thead th {
+    background: #eef7f1 !important;
+    color: #263238 !important;
+    font-size: 0.76rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.06em !important;
+    padding: 13px 14px !important;
+    text-transform: uppercase !important;
+}
+
+html.role-admin body:not(.client-store) .data-table tbody td,
+html.role-admin body:not(.client-store) table tbody td,
+html.role-admin body:not(.client-store) .user-perms-table tbody td {
+    background: #fff !important;
+    border-bottom: 1px solid #edf1ee !important;
+    color: #263238 !important;
+    padding: 13px 14px !important;
+}
+
+html.role-admin body:not(.client-store) .data-table tbody tr:hover td,
+html.role-admin body:not(.client-store) table tbody tr:hover td,
+html.role-admin body:not(.client-store) .user-perms-table tbody tr:hover td {
+    background: #f6fbf7 !important;
+}
+
+html.role-admin body:not(.client-store) .btn-primary,
+html.role-admin body:not(.client-store) .filter-btn.active,
+html.role-admin body:not(.client-store) .stats-filter-tab.active {
+    background: #2e7d32 !important;
+    border-color: #2e7d32 !important;
+    color: #fff !important;
+}
+
+html.role-admin body:not(.client-store) .input:focus,
+html.role-admin body:not(.client-store) input:focus,
+html.role-admin body:not(.client-store) select:focus,
+html.role-admin body:not(.client-store) textarea:focus {
+    border-color: #2e7d32 !important;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.12) !important;
+}
+
+@media (max-width: 900px) {
+    html.role-admin body:not(.client-store) {
+        padding: 0 !important;
+    }
+
+    html.role-admin body:not(.client-store) .app-layout {
+        border-radius: 0 !important;
+        height: 100vh !important;
+    }
+
+    html.role-admin body:not(.client-store) .top-navbar {
+        flex-basis: 82px !important;
+        max-width: 82px !important;
+        padding: 16px 8px !important;
+        width: 82px !important;
+    }
+
+    html.role-admin body:not(.client-store) .navbar-title,
+    html.role-admin body:not(.client-store) .company-tag,
+    html.role-admin body:not(.client-store) .navbar-link > span {
+        display: none !important;
+    }
+
+    html.role-admin body:not(.client-store) .navbar-link {
+        justify-content: center !important;
+        padding: 0 !important;
+    }
+}
