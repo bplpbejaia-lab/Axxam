@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Client - Axxam</title>
+    <meta name="description" content="Commander les produits Axxam">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/extra.css">
+</head>
+
+<body class="client-store">
+    <header class="client-store-header">
+        <a class="client-store-brand" href="/client/">
+            <span class="navbar-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="18" rx="3" />
+                    <line x1="8" y1="3" x2="8" y2="21" />
+                    <line x1="16" y1="3" x2="16" y2="21" />
+                    <line x1="2" y1="9" x2="22" y2="9" />
+                    <line x1="2" y1="15" x2="22" y2="15" />
+                </svg>
+            </span>
+            <strong>Axxam</strong>
+        </a>
+        <nav class="client-store-tabs">
+            <button class="client-tab active" data-client-view="catalog">Commander</button>
+            <button class="client-tab" data-client-view="tracking">Mes commandes</button>
+            <button class="client-tab" data-client-view="account" id="clientAccountTab">Compte</button>
+        </nav>
+        <div class="client-account-bar" id="clientAccountBar" hidden>
+            <span id="clientAccountLabel"></span>
+            <button class="btn btn-outline" type="button" id="clientLogoutBtn">Deconnexion</button>
+        </div>
+    </header>
+
+    <section class="client-auth-panel" id="clientAuthView" hidden>
+        <div class="client-auth-card">
+            <p class="page-eyebrow">Compte client</p>
+            <h1>Connectez-vous pour commander</h1>
+            <p>Un seul compte suffit. Votre login est unique et toutes vos commandes y seront rattachees.</p>
+
+            <div class="client-auth-tabs">
+                <button class="client-auth-tab active" type="button" data-auth-view="login">Connexion</button>
+                <button class="client-auth-tab" type="button" data-auth-view="register">Creer un compte</button>
+            </div>
+
+            <form class="client-auth-form" id="clientLoginForm">
+                <input class="input" id="loginIdentifier" placeholder="Login unique" autocomplete="username" required>
+                <input class="input" id="loginPassword" type="password" placeholder="Mot de passe" autocomplete="current-password" required>
+                <button class="btn btn-primary w-full" type="submit">Se connecter</button>
+            </form>
+
+            <form class="client-auth-form" id="clientRegisterForm" hidden>
+                <input class="input" id="registerLogin" placeholder="Choisir un login unique" autocomplete="username" required>
+                <input class="input" id="registerPassword" type="password" placeholder="Mot de passe" autocomplete="new-password" required>
+                <input class="input" id="registerName" placeholder="Nom complet" required>
+                <input class="input" id="registerPhone" placeholder="Telephone" required>
+                <input class="input" id="registerAddress" placeholder="Adresse ou point de retrait">
+                <button class="btn btn-primary w-full" type="submit">Creer le compte</button>
+            </form>
+        </div>
+    </section>
+
+    <main class="client-store-shell client-store-shell-wide" id="clientStoreShell">
+        <section class="client-catalog-panel" id="clientCatalogView">
+            <div class="client-catalog-head">
+                <div>
+                    <p class="page-eyebrow">Boutique client</p>
+                    <h1>Produits</h1>
+                </div>
+                <label class="client-search-box" for="clientProductSearch">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <path d="m20 20-3.5-3.5"></path>
+                    </svg>
+                    <input id="clientProductSearch" type="search" placeholder="Rechercher un produit..." autocomplete="off">
+                </label>
+            </div>
+
+            <div class="client-catalog-toolbar">
+                <div class="client-category-tabs" id="clientCategoryTabs"></div>
+                <span class="client-catalog-count" id="clientCatalogCount">0 produits</span>
+            </div>
+            <div class="client-products-grid" id="clientProductsGrid"></div>
+        </section>
+
+        <aside class="client-cart-panel" id="clientCartPanel" hidden>
+            <div class="client-cart-header">
+                <h2>Panier</h2>
+                <span id="clientCartCount">0</span>
+            </div>
+            <div class="client-cart-items" id="clientCartItems"></div>
+            <form class="client-checkout-form" id="clientCheckoutForm">
+                <div class="client-cart-total">
+                    <span>Total</span>
+                    <strong id="clientCartTotal">0,0 DA</strong>
+                </div>
+                <div class="client-checkout-identity" id="clientCheckoutIdentity"></div>
+                <input class="input" id="clientAddress" placeholder="Adresse ou point de retrait">
+                <textarea class="input" id="clientNote" rows="3" placeholder="Note pour la commande"></textarea>
+                <button class="btn btn-primary w-full" type="submit">Envoyer la commande</button>
+            </form>
+        </aside>
+
+        <section class="client-tracking-panel" id="clientTrackingView" hidden>
+            <div class="client-store-intro">
+                <p class="page-eyebrow">Suivi</p>
+                <h1>Mes commandes</h1>
+                <p>Connectez-vous pour retrouver vos commandes liees a votre compte client.</p>
+            </div>
+            <form class="client-tracking-form" id="clientTrackingForm">
+                <button class="btn btn-primary" type="submit">Actualiser mes commandes</button>
+            </form>
+            <div class="client-orders-list" id="clientOrdersList"></div>
+        </section>
+    </main>
+
+    <div class="client-product-modal" id="clientProductModal" hidden>
+        <div class="client-product-modal-card">
+            <button class="client-product-modal-close" type="button" id="clientProductModalClose" aria-label="Fermer">×</button>
+            <div class="client-product-detail" id="clientProductDetail"></div>
+        </div>
+    </div>
+
+    <div class="client-toast" id="clientToast"></div>
+    <script src="/js/client-app.js"></script>
+</body>
+
+</html>

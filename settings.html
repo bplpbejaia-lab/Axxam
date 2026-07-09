@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - Axxam</title>
+    <meta name="description" content="Paramètres de l'application - Axxam">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/extra.css">
+    <script src="js/auth.js"></script>
+    <script>authService.checkAuth(); // Check auth immediately</script>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Modern Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo-wrapper">
+                    <div class="navbar-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="18" rx="3" />
+                            <line x1="8" y1="3" x2="8" y2="21" />
+                            <line x1="16" y1="3" x2="16" y2="21" />
+                            <line x1="2" y1="9" x2="22" y2="9" />
+                            <line x1="2" y1="15" x2="22" y2="15" />
+                        </svg>
+                    </div>
+                    <span class="company-tag">Axxam</span>
+                </div>
+                <h1 class="navbar-title">Axxam</h1>
+            </div>
+
+            <nav class="navbar-nav">
+                <a href="index.html" class="navbar-link" title="Ventes" aria-label="Ventes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span>Ventes</span>
+                </a>
+                <a href="withdrawals.html" class="navbar-link" title="Caisse" aria-label="Caisse">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                    <span>Caisse</span>
+                </a>
+                <a href="inventory.html" class="navbar-link" title="Stock" aria-label="Stock">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <span>Stock</span>
+                </a>
+                <a href="achats.html" class="navbar-link" title="Achats" aria-label="Achats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Achats</span>
+                </a>
+                <a href="commandes.html" class="navbar-link" title="Commandes" aria-label="Commandes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11h6"/><path d="M9 15h6"/><path d="M8 3h8l2 3v15H6V6z"/><path d="M8 3v3h10"/></svg>
+                    <span>Commandes</span>
+                </a>
+                <a href="stats.html" class="navbar-link" title="Stats" aria-label="Stats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                    <span>Stats</span>
+                </a>
+                <a href="categories.html" class="navbar-link" title="Categories" aria-label="Categories">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.8 2.8 0 0 1 0 4L15 21"/><path d="m7 5 6.3 6.3a2.8 2.8 0 0 1 0 4L7 21"/><path d="M2 13.5V5a3 3 0 0 1 3-3h8.5"/><circle cx="7" cy="7" r="1"/></svg>
+                    <span>Categories</span>
+                </a>
+                <a href="settings.html" class="navbar-link active" title="Parametres" aria-label="Parametres">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Parametres</span>
+                </a>
+            </nav>
+
+            <div class="navbar-actions">
+                <button type="button" class="btn btn-danger btn-sm" id="resetDatabaseTopBtn"
+                    style="display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; min-height: 40px;"
+                    title="Remettre toute la base de donnees a zero">
+                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.4"
+                        fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 6h18"></path>
+                        <path d="M8 6V4h8v2"></path>
+                        <path d="M19 6l-1 14H6L5 6"></path>
+                        <path d="M10 11v5"></path>
+                        <path d="M14 11v5"></path>
+                    </svg>
+                    Reset BDD a 0
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-area" id="mainAreaSettings" style="overflow-y: auto; position: relative;">
+            <!-- Scroll Buttons for Settings -->
+            <div class="scroll-nav-container" style="bottom: 30px; right: 30px; position: fixed;">
+                <button class="scroll-nav-btn" onclick="document.getElementById('mainAreaSettings').scrollBy({top: -400, behavior: 'smooth'})" title="Vers le haut">
+                    <svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6" /></svg>
+                </button>
+                <button class="scroll-nav-btn" onclick="document.getElementById('mainAreaSettings').scrollBy({top: 400, behavior: 'smooth'})" title="Vers le bas">
+                    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                </button>
+            </div>
+            <main class="settings-page"
+                style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; align-items: start;">
+
+                <!-- Left Column: General & Personal -->
+                <div class="settings-card card">
+                    <h2 class="mb-xl" style="display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Paramètres Généraux
+                    </h2>
+
+                    <form id="settingsForm" class="settings-form">
+                        <div class="form-group">
+                            <label>Taux de TVA (%)</label>
+                            <input type="number" class="input" id="settingsTva" placeholder="Ex: 19">
+                            <p class="text-sm text-muted mt-sm">Laisser vide si non applicable</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fond de caisse initial (DA)</label>
+                            <input type="number" class="input" id="settingsInitialCash" placeholder="Ex: 5000">
+                            <p class="text-sm text-muted mt-sm">Montant de base présent dans la caisse.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Calcul des coûts (Matières Premières)</label>
+                            <select class="input" id="settingsCostCalcMethod" style="background: white; cursor: pointer;">
+                                <option value="last">Dernier lot acheté</option>
+                                <option value="avg">Moyenne simple des prix</option>
+                                <option value="wavg">Moyenne pondérée (CMUP)</option>
+                            </select>
+                            <p class="text-sm text-muted mt-sm">Définit comment le coût unitaire est calculé pour les recettes et la production.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Informations de Contact (Ticket)</label>
+                            <textarea class="input" id="settingsContact" rows="3"
+                                placeholder="Adresse, Téléphone, Email..."></textarea>
+                            <p class="text-sm text-muted mt-sm">Bas du ticket de caisse.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Apparence</label>
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--light); border-radius: 12px;">
+                                <span>Mode Sombre / Clair</span>
+                                <button type="button" class="btn btn-outline" id="themeToggle">🌙 Basculer</button>
+                            </div>
+                        </div>
+
+                        
+                        <div class="form-section-divider"></div>
+                        <h3 class="mb-md mt-xl" style="display: flex; align-items: center; gap: 10px;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            Configuration Imprimante
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Nom de l'imprimante par défaut</label>
+                            <input type="text" class="input" id="settingsPrinterName" placeholder="Ex: XP-80C">
+                            <p class="text-sm text-muted mt-sm">Identification de l'imprimante cible.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Format du ticket</label>
+                            <select class="input" id="settingsPrinterFormat">
+                                <option value="90mm">Thermique 90mm (Large)</option>
+                                <option value="80mm">Thermique 80mm (Standard)</option>
+                                <option value="58mm">Thermique 58mm (Compact)</option>
+                                <option value="A4">Standard A4</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Impression automatique</label>
+                            <div
+                                style="display: flex; align-items: center; justify-content: space-between; padding: 15px; background: var(--light); border-radius: 12px;">
+                                <span>Lancer l'impression après chaque vente</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="settingsAutoPrint">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tiroir-caisse (Caisse numérique)</label>
+                            <div style="display: flex; flex-direction: column; gap: 10px; padding: 15px; background: var(--light); border-radius: 12px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Ouvrir à chaque vente</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="settingsOpenDrawerOnSale">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                                                         <span>Ticket & Caisse après versement/retrait</span>
+
+                                    <label class="switch">
+                                        <input type="checkbox" id="settingsOpenDrawerOnWithdrawal">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <button type="button" class="btn btn-outline btn-sm w-full" onclick="openCashDrawer()" style="margin-top: 5px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    Tester l'ouverture du tiroir
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Aide pour l'impression silencieuse -->
+                        <div class="info-box mt-md"
+                            style="background: rgba(var(--primary-rgb), 0.1); border-left: 4px solid var(--primary); padding: 15px; border-radius: 8px;">
+                            <h4 style="margin-top: 0; color: var(--primary);"> Impression Silencieuse (Sans fenêtre)
+                            </h4>
+                            <p class="text-sm" style="margin-bottom: 8px;">Pour imprimer directement sans confirmer,
+                                utilisez le fichier <strong>"Lancer_Axxam.bat"</strong> qui se trouve dans le
+                                dossier de l'application.</p>
+                            <p class="text-sm">Si vous ouvrez le fichier <code>index.html</code> directement, le
+                                navigateur affichera toujours la fenêtre de confirmation pour des raisons de sécurité.
+                            </p>
+                        </div>
+
+                        <!-- Portabilité des données -->
+                        <div class="form-section-divider"></div>
+                        <h3 class="mb-md mt-xl" style="display: flex; align-items: center; gap: 10px;">
+                             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                             Sauvegarde & Portabilité
+                        </h3>
+                        <p class="text-sm text-muted mb-md">Utilisez ces options pour copier vos données sur une autre
+                            machine.</p>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                            <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="exportData()">
+                                📤 Exporter (Backup)
+                            </button>
+                            <button type="button" class="btn btn-outline" style="flex: 1;"
+                                onclick="document.getElementById('importFileInput').click()">
+                                📥 Importer
+                            </button>
+                            <button type="button" class="btn btn-danger" style="flex: 1;" onclick="clearAllData()">
+                                🗑️ Vider toutes les données
+                            </button>
+                            <input type="file" id="importFileInput" style="display: none;" accept=".json"
+                                onchange="importData(this.files[0])">
+                        </div>
+
+                        <!-- Accessibilité -->
+                        <div class="form-group">
+                            <label>Accessibilité</label>
+                            <div style="display: flex; flex-direction: column; gap: 10px; padding: 15px; background: var(--light); border-radius: 12px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Clavier Virtuel Tactile</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="keyboardToggle">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Flèches de navigation (Scroll)</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="scrollArrowsToggle">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Section -->
+                        <h3 class="mb-md mt-xl" style="display: flex; align-items: center; gap: 10px;">
+                             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                             Mon Compte
+                        </h3>
+                        <div class="form-group p-md" style="background: var(--light); border-radius: 12px;">
+                            <label>Changer mon mot de passe</label>
+                            <input type="password" class="input mb-sm" id="currentPassword"
+                                placeholder="Mot de passe actuel">
+                            <input type="password" class="input mb-sm" id="newPassword"
+                                placeholder="Nouveau mot de passe">
+                            <button type="button" class="btn btn-secondary w-full" id="changePasswordBtn">Mettre à
+                                jour</button>
+                        </div>
+
+                        <div class="settings-actions mt-lg">
+                            <button type="button" class="btn btn-outline" id="resetSettingsBtn">Réinitialiser</button>
+                            <button type="submit" class="btn btn-primary" style="flex: 1;">Enregistrer</button>
+                        </div>
+
+                        <div class="logout-container">
+                            <button type="button" class="btn btn-danger w-full" id="logoutBtn"
+                                style="font-weight: 800; padding: 15px;">
+                                🚪 Se Déconnecter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Admin Panel (Hidden for non-admins via JS) -->
+                <div class="settings-card card" id="adminSection" style="display: none;">
+                    <h2 class="mb-xl" style="color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        Administration
+                    </h2>
+
+                    <!-- Branding Section -->
+                    <div class="mb-xl pb-lg" style="border-bottom: 1px solid var(--border);">
+                        <h3 class="mb-md" style="display: flex; align-items: center; gap: 10px;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.5 1.5"></path><path d="M7.6 7.6L2 2l1.6 4.3"></path></svg>
+                            Personnalisation
+                        </h3>
+
+                        <div class="form-group">
+                            <label>Logo de l'application</label>
+                            <input type="file" id="logoInput" accept="image/*" class="input">
+                            <p class="text-sm text-muted">Format recommandé: PNG carré.</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Image de fond (Page de connexion)</label>
+                            <input type="file" id="bgInput" accept="image/*" class="input">
+                            <p class="text-sm text-muted">Grande image haute qualité.</p>
+                        </div>
+
+                        <button class="btn btn-outline btn-sm text-danger" id="resetBrandingBtn">Restaurer le design par
+                            défaut</button>
+                    </div>
+
+                    <!-- User Management -->
+                    <div class="mb-xl pb-lg" style="border-bottom: 1px solid var(--border);">
+                        <h3 class="mb-md" style="display: flex; align-items: center; gap: 10px; color: var(--danger);">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            Zone de Danger
+                        </h3>
+                        <p class="text-sm text-muted mb-md">Attention: cela reinitialise les ventes, produits et achats
+                            de la base SQLite locale.</p>
+                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:8px;">
+                            <button class="btn btn-outline btn-sm text-danger" id="clearAppDbBtn">Réinitialiser toute
+                                l'application</button>
+                            <button class="btn btn-secondary btn-sm" type="button" id="exportDbFileBtn" onclick="downloadDatabaseFile()">Exporter la base</button>
+                            <button class="btn btn-outline btn-sm" type="button" id="migrateToFileBtn" onclick="migrateToFile()">Nettoyer ancien LocalStorage</button>
+                        </div>
+                        <p class="text-sm text-muted">La source active est maintenant <code>data/axxam.sqlite</code>. L'export sert uniquement de sauvegarde lisible.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="mb-md" style="display: flex; align-items: center; gap: 10px;">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Gestion des Utilisateurs
+                        </h3>
+
+                        <!-- List -->
+                        <div style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                            <table class="user-perms-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Utilisateur</th>
+                                        <th>Ventes</th>
+                                        <th>Stock</th>
+                                        <th>Stats</th>
+                                        <th>Catég.</th>
+                                        <th>Param.</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add User Form -->
+                        <form id="addUserForm" style="padding: 15px; background: var(--bg-main); border-radius: 12px;">
+                            <h4 class="mb-sm">Ajouter un utilisateur</h4>
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="text" id="newUsername" class="input" placeholder="Identifiant" required>
+                                <input type="text" id="newUserInfo" style="display:none"> <!-- honey pot or junk -->
+                                <select id="newRole" class="input" required>
+                                    <option value="user">Utilisateur</option>
+                                    <option value="admin">Administrateur</option>
+                                </select>
+                            </div>
+                            <div class="form-grid mt-sm" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <input type="text" id="newName" class="input" placeholder="Nom complet" required>
+                                <input type="password" id="newUserPwd" class="input" placeholder="Mot de passe"
+                                    required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-full mt-md">+ Créer l'utilisateur</button>
+                        </form>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/app.js"></script>
+    <script src="js/virtual-keyboard.js"></script>
+    <script src="js/branding.js"></script>
+    <script src="js/settings.js"></script>
+    
+</body>
+
+</html>

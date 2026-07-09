@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retraits - Axxam</title>
+    <meta name="description" content="Gestion des retraits caisse et bénéfice - Axxam">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/extra.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="js/auth.js"></script>
+    <script>authService.checkAuth('admin');</script>
+    <style>
+        .compact-swal-popup {
+            max-width: 320px !important;
+            padding: 10px !important;
+            margin-top: 20px !important;
+        }
+        .compact-swal-title {
+            font-size: 16px !important;
+            padding: 0 0 5px 0 !important;
+            margin: 0 !important;
+        }
+        .compact-swal-content {
+            padding: 0 !important;
+        }
+        .swal2-container {
+            align-items: flex-start !important;
+            padding-top: 50px !important;
+        }
+        .swal2-actions {
+            margin-top: 8px !important;
+        }
+        .swal2-confirm, .swal2-cancel {
+            padding: 6px 16px !important;
+            font-size: 14px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Modern Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo-wrapper">
+                    <div class="navbar-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="18" rx="3" />
+                            <line x1="8" y1="3" x2="8" y2="21" />
+                            <line x1="16" y1="3" x2="16" y2="21" />
+                            <line x1="2" y1="9" x2="22" y2="9" />
+                            <line x1="2" y1="15" x2="22" y2="15" />
+                        </svg>
+                    </div>
+                    <span class="company-tag">Axxam</span>
+                </div>
+                <h1 class="navbar-title">Axxam</h1>
+            </div>
+
+            <nav class="navbar-nav">
+                <a href="index.html" class="navbar-link" title="Ventes" aria-label="Ventes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span>Ventes</span>
+                </a>
+                <a href="withdrawals.html" class="navbar-link active" title="Caisse" aria-label="Caisse">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                    <span>Caisse</span>
+                </a>
+                <a href="inventory.html" class="navbar-link" title="Stock" aria-label="Stock">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <span>Stock</span>
+                </a>
+                <a href="achats.html" class="navbar-link" title="Achats" aria-label="Achats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Achats</span>
+                </a>
+                <a href="commandes.html" class="navbar-link" title="Commandes" aria-label="Commandes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11h6"/><path d="M9 15h6"/><path d="M8 3h8l2 3v15H6V6z"/><path d="M8 3v3h10"/></svg>
+                    <span>Commandes</span>
+                </a>
+                <a href="stats.html" class="navbar-link" title="Stats" aria-label="Stats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                    <span>Stats</span>
+                </a>
+                <a href="categories.html" class="navbar-link" title="Categories" aria-label="Categories">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.8 2.8 0 0 1 0 4L15 21"/><path d="m7 5 6.3 6.3a2.8 2.8 0 0 1 0 4L7 21"/><path d="M2 13.5V5a3 3 0 0 1 3-3h8.5"/><circle cx="7" cy="7" r="1"/></svg>
+                    <span>Categories</span>
+                </a>
+                <a href="settings.html" class="navbar-link" title="Parametres" aria-label="Parametres">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Parametres</span>
+                </a>
+            </nav>
+
+            <div class="navbar-actions" style="display: flex; align-items: center; gap: var(--space-xl);">
+                <!-- Actions removed as requested -->
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-area" id="mainAreaWithdrawals" style="overflow-y: auto; position: relative;">
+            <!-- Scroll Buttons for Withdrawals -->
+            <div class="scroll-nav-container" style="bottom: 30px; right: 30px; position: fixed;">
+                <button class="scroll-nav-btn" onclick="document.getElementById('mainAreaWithdrawals').scrollBy({top: -400, behavior: 'smooth'})" title="Vers le haut">
+                    <svg viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6" /></svg>
+                </button>
+                <button class="scroll-nav-btn" onclick="document.getElementById('mainAreaWithdrawals').scrollBy({top: 400, behavior: 'smooth'})" title="Vers le bas">
+                    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" /></svg>
+                </button>
+            </div>
+            <main style="padding: var(--space-lg); max-width: 1300px; margin: 0 auto;">
+
+                <!-- Premium Horizontal Operation Card -->
+                <div class="premium-operation-card animate-fadeIn">
+                    <div class="operation-header-compact">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <rect x="2" y="5" width="20" height="14" rx="2" />
+                            <line x1="2" y1="10" x2="22" y2="10" />
+                        </svg>
+                        <h3>Nouvelle Opération</h3>
+                    </div>
+
+                    <form onsubmit="addWithdrawal(event)" class="operation-grid-horizontal">
+                        <div class="form-group-compact">
+                            <label>Type</label>
+                            <select class="input-premium" id="withdrawalCategory"
+                                onchange="toggleWithdrawalType(this.value)">
+                                <option value="retrait">Retrait Caisse</option>
+                                <option value="ajout">Ajout Fond de Caisse</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-compact" id="withdrawalTypeGroup">
+                            <label>Détail</label>
+                            <select class="input-premium" id="withdrawalType">
+                                <option value="Personnel">Personnel</option>
+                                <option value="Facture">Facture</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group-compact">
+                            <label>Motif / Raison</label>
+                            <input type="text" class="input-premium" id="withdrawalReason"
+                                placeholder="Ex: Achat café, Salaire...">
+                        </div>
+
+                        <div class="form-group-compact">
+                            <label>Montant (DA)</label>
+                            <input type="number" step="0.01" class="input-premium" id="withdrawalAmount"
+                                placeholder="0.00 DA" required inputmode="decimal">
+                        </div>
+
+                        <button type="submit" class="btn-premium-submit">
+                            <span>Enregistrer</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Withdrawal History -->
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <div class="flex"
+                        style="justify-content: space-between; align-items: center; margin-bottom: var(--space-lg); padding-bottom: 10px; border-bottom: 1px solid var(--light);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h3 style="margin: 0;">Historique des Opérations</h3>
+                        </div>
+                        <div class="stats-filter-tabs" id="withdrawalPeriodFilter">
+                            <button class="stats-filter-tab active" data-period="all">Tout</button>
+                            <button class="stats-filter-tab" data-period="day">Jour</button>
+                            <button class="stats-filter-tab" data-period="month">Mois</button>
+                            <button class="stats-filter-tab" data-period="year">Année</button>
+                        </div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Opération</th>
+                                    <th>Type/Détail</th>
+                                    <th>Motif</th>
+                                    <th>Montant</th>
+                                    <th style="text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="withdrawalsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/virtual-keyboard.js"></script>
+    <script>
+        function toggleWithdrawalType(category) {
+            const group = document.getElementById('withdrawalTypeGroup');
+            if (category === 'ajout') {
+                group.style.display = 'none';
+            } else {
+                group.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axxam - Point de Vente</title>
+    <meta name="description" content="Système de gestion de chocolaterie - Point de vente">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <!-- Prefetch most visited pages for faster MPA navigation -->
+    <link rel="prefetch" href="inventory.html">
+    <link rel="prefetch" href="achats.html">
+    <link rel="prefetch" href="commandes.html">
+    <link rel="prefetch" href="stats.html">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/extra.css">
+    <style>
+        .stock-status-pill {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .stock-status-pill.ok {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .stock-status-pill.low {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .stock-status-pill.out {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .compact-qty:focus {
+            border-color: var(--primary) !important;
+            background: white !important;
+        }
+
+        /* Highlight for newly added/updated cart items */
+        .cart-item.highlighted {
+            background: #e8f5e9;
+            border-left: 4px solid #2e7d32;
+            transition: background 0.3s ease, border-left-color 0.3s ease;
+            border-radius: 6px;
+            padding-left: 8px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="js/auth.js"></script>
+    <script>authService.checkAuth(); // Check auth immediately</script>
+    <script>
+        // Prechargement immediat des donnees via SQLite quand le serveur local est actif.
+        (function () {
+            if (!location.protocol.startsWith('http')) return;
+
+            fetch('/api/db', { cache: 'no-store' })
+                .then(response => response.ok ? response.json() : null)
+                .then(state => {
+                    if (!state) return;
+                    window.db = state.db;
+                    window.parallelOrdersCache = state.parallelOrders || [];
+                    console.log('Donnees SQLite prechargees');
+                })
+                .catch(() => console.warn('Prechargement SQLite indisponible'));
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        <header class="top-navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo-wrapper">
+                    <div class="navbar-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="18" rx="3" />
+                            <line x1="8" y1="3" x2="8" y2="21" />
+                            <line x1="16" y1="3" x2="16" y2="21" />
+                            <line x1="2" y1="9" x2="22" y2="9" />
+                            <line x1="2" y1="15" x2="22" y2="15" />
+                        </svg>
+                    </div>
+                    <span class="company-tag">Axxam</span>
+                </div>
+                <h1 class="navbar-title">Axxam</h1>
+            </div>
+
+            <nav class="navbar-nav">
+                <a href="index.html" class="navbar-link active" title="Ventes" aria-label="Ventes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span>Ventes</span>
+                </a>
+                <a href="withdrawals.html" class="navbar-link" title="Caisse" aria-label="Caisse">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                    <span>Caisse</span>
+                </a>
+                <a href="inventory.html" class="navbar-link" title="Stock" aria-label="Stock">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <span>Stock</span>
+                </a>
+                <a href="achats.html" class="navbar-link" title="Achats" aria-label="Achats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Achats</span>
+                </a>
+                <a href="commandes.html" class="navbar-link" title="Commandes" aria-label="Commandes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11h6"/><path d="M9 15h6"/><path d="M8 3h8l2 3v15H6V6z"/><path d="M8 3v3h10"/></svg>
+                    <span>Commandes</span>
+                </a>
+                <a href="stats.html" class="navbar-link" title="Stats" aria-label="Stats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                    <span>Stats</span>
+                </a>
+                <a href="categories.html" class="navbar-link" title="Categories" aria-label="Categories">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.8 2.8 0 0 1 0 4L15 21"/><path d="m7 5 6.3 6.3a2.8 2.8 0 0 1 0 4L7 21"/><path d="M2 13.5V5a3 3 0 0 1 3-3h8.5"/><circle cx="7" cy="7" r="1"/></svg>
+                    <span>Categories</span>
+                </a>
+                <a href="settings.html" class="navbar-link" title="Parametres" aria-label="Parametres">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Parametres</span>
+                </a>
+            </nav>
+            <div class="navbar-actions">
+                <div class="search-box">
+                    <span class="search-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
+                        </svg>
+                    </span>
+                    <input type="text" placeholder="Rechercher..." id="searchInput">
+                </div>
+                <button class="btn btn-outline" id="reorderBtn" onclick="toggleReorderMode()"
+                    title="Réorganiser les produits">
+                    🔃 <span class="btn-text">Réorganiser</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-area">
+            <!-- Products Section -->
+            <main class="products-section">
+                <div class="category-bar">
+                    <div class="category-pills" id="categoryPills">
+                        <button class="category-pill active" data-category="all">
+                            Tous <span class="badge" id="allCount">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="products-grid-full" id="productsGrid"></div>
+                <!-- Scroll Buttons for Products -->
+                <div class="scroll-nav-container" style="bottom: 80px; right: 20px;">
+                    <button class="scroll-nav-btn"
+                        onclick="document.getElementById('productsGrid').scrollBy({top: -300, behavior: 'smooth'})"
+                        title="Vers le haut">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 15l-6-6-6 6" />
+                        </svg>
+                    </button>
+                    <button class="scroll-nav-btn"
+                        onclick="document.getElementById('productsGrid').scrollBy({top: 300, behavior: 'smooth'})"
+                        title="Vers le bas">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </button>
+                </div>
+            </main>
+
+            <!-- Cart Panel -->
+            <aside class="cart-panel">
+                <!-- Parallel Order Tabs -->
+                <!-- Parallel Order Tabs with Arrows -->
+                <div class="parallel-tabs-wrapper" style="position: relative;">
+                    <div id="parallelOrderTabs" class="parallel-order-tabs"></div>
+                    <div class="parallel-scroll-arrows"
+                        style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 2px; z-index: 10; padding-right: 4px;">
+                        <button
+                            onclick="document.getElementById('parallelOrderTabs').scrollBy({left: -100, behavior: 'smooth'})"
+                            style="background: white; border: 1px solid var(--border); border-radius: 4px; padding: 2px; cursor: pointer; display: flex; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                        </button>
+                        <button
+                            onclick="document.getElementById('parallelOrderTabs').scrollBy({left: 100, behavior: 'smooth'})"
+                            style="background: white; border: 1px solid var(--border); border-radius: 4px; padding: 2px; cursor: pointer; display: flex; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3">
+                                <path d="M9 18l6-6-6-6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cart-header">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                            style="vertical-align: middle; margin-right: 8px;">
+                            <circle cx="8" cy="21" r="1" />
+                            <circle cx="19" cy="21" r="1" />
+                            <path
+                                d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                        </svg>
+                        Commande <span class="cart-count" id="cartCount">0</span>
+                    </h3>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <button class="btn-icon-compact" onclick="openSalesHistory()" title="Historique des ventes"
+                            style="background:none; border:1px solid var(--border); border-radius:8px; padding:6px; cursor:pointer; color:var(--primary);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                        </button>
+                        <button class="btn-icon-compact" id="toggleClientPanelBtn" title="Sélectionner un client">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </button>
+                        <label class="btn-icon-compact cart-credit-icon-option" title="Vente a credit">
+                            <input type="checkbox" id="creditSaleToggle"
+                                onchange="this.closest('.cart-credit-icon-option').classList.toggle('is-credit-active', this.checked); this.closest('.cart-credit-icon-option').style.backgroundColor = this.checked ? '#0f766e' : ''; this.closest('.cart-credit-icon-option').style.color = this.checked ? '#ffffff' : '';">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="5" width="18" height="14" rx="2" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                                <path d="M7 15h4" />
+                            </svg>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Compact Client Panel (hidden by default) -->
+                <div id="compactClientPanel" class="client-selection compact-panel" style="display: none;">
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                        <span
+                            style="font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Client</span>
+                        <button onclick="openClientModal()"
+                            style="background: none; border: none; color: var(--primary); font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <span>+ Nouveau</span>
+                        </button>
+                    </div>
+                    <div class="client-selector-wrapper" style="position: relative;">
+                        <div class="client-selector-wrapper"
+                            style="position: relative; display: flex; gap: 6px; align-items: center;">
+                            <div style="position: relative; flex: 1;">
+                                <select id="clientSelector" onchange="handleClientChange()"
+                                    style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--border); background: white; font-family: inherit; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); cursor: pointer; outline: none; appearance: none; transition: 0.2s;">
+                                    <!-- Filled by JS -->
+                                </select>
+                                <div
+                                    style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-light); font-size: 0.8rem;">
+                                    ▼</div>
+                            </div>
+                            <button onclick="editSelectedClient()" class="btn-icon-compact" title="Modifier le client"
+                                style="padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: white; cursor: pointer;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 20h9" />
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                                </svg>
+                            </button>
+                            <button onclick="deleteSelectedClient()" class="btn-icon-compact"
+                                title="Supprimer le client"
+                                style="padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: white; cursor: pointer; color: var(--danger);">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6" />
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                    <div class="cart-items" id="cartItems">
+                        <div class="empty-state" id="emptyCart">
+                            <span class="icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                                    style="opacity: 0.3;">
+                                    <circle cx="8" cy="21" r="1" />
+                                    <circle cx="19" cy="21" r="1" />
+                                    <path
+                                        d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                                </svg>
+                            </span>
+                            <p>Panier vide</p>
+                            <p class="text-sm">Cliquez sur un produit</p>
+                        </div>
+                    </div>
+                    <!-- Small Scroll Arrows for Cart -->
+                    <div class="cart-scroll-arrows">
+                        <button
+                            onclick="document.getElementById('cartItems').scrollBy({top: -150, behavior: 'smooth'})">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 15l-6-6-6 6" />
+                            </svg>
+                        </button>
+                        <button onclick="document.getElementById('cartItems').scrollBy({top: 150, behavior: 'smooth'})">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cart-footer" style="padding: 10px 12px !important;">
+                    <div class="cart-total" style="padding: 6px 10px !important; margin-bottom: 8px !important;">
+                        <span class="cart-total-label"
+                            style="font-size: 0.85rem !important; padding: 2px 8px !important;">Total</span>
+                        <span class="cart-total-amount" id="total"
+                            style="font-size: 1.2rem !important; padding: 2px 8px !important;">0 DA</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                        <!-- Remise Compacte -->
+                        <div class="cart-discount" style="display: flex; align-items: center; gap: 4px; flex: 1; background: rgba(139, 69, 19, 0.05); padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border);">
+                            <span id="cartDiscountLabel" style="font-size: 0.7rem; font-weight: 800; color: var(--primary); white-space: nowrap;">Rem.</span>
+                            <input type="number" id="cartDiscountInput" placeholder="0" 
+                                style="width: 55px; padding: 4px; border: 1px solid var(--border); border-radius: 6px; font-weight: 700; text-align: right; font-size: 0.85rem; outline: none; background: white;"
+                                oninput="updateCart()"
+                                onfocus="setTimeout(() => this.scrollIntoView({behavior: 'smooth', block: 'center'}), 300)">
+                            <button id="toggleCartDiscountType" onclick="toggleCartDiscountType()" 
+                                style="background: var(--primary); color: white; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.65rem; font-weight: 800; cursor: pointer;">%</button>
+                        </div>
+
+                        <label class="cart-ticket-option"
+                            style="margin-bottom: 0; cursor: pointer; padding: 6px 10px; background: var(--primary); color: white; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                            <input type="checkbox" id="printTicketToggle" checked style="width: 14px; height: 14px;">
+                            Ticket
+                        </label>
+                        <label class="cart-ticket-option"
+                            style="margin-bottom: 0; cursor: pointer; padding: 6px 10px; background: var(--primary); color: white; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                            <input type="checkbox" id="caisseToggle" style="width: 14px; height: 14px;">
+                            Caisse
+                        </label>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline" onclick="createParallelOrder()"
+                            style="padding: 8px; min-width: 40px; height: 40px;" title="Mettre en attente">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="6" y="4" width="4" height="16" />
+                                <rect x="14" y="4" width="4" height="16" />
+                            </svg>
+                        </button>
+                        <button class="btn btn-accent btn-lg" id="checkoutBtn"
+                            style="flex: 1; padding: 8px 12px !important; font-size: 0.95rem !important; height: 40px;">
+                            ✓ Valider la Vente
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        style="vertical-align: middle; margin-right: 8px;">
+                        <path
+                            d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1" />
+                        <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" />
+                    </svg>
+                    Paiement Caisse
+                </h3>
+                <button class="modal-close" id="closePaymentModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p class="text-muted">Total à Payer</p>
+                    <div id="paymentTotalDisplay" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">
+                        0,00 DA</div>
+                </div>
+
+                <div id="remiseSection" style="margin-bottom: 20px;">
+                    <button id="toggleRemiseBtn"
+                        style="background: none; border: none; color: var(--primary); font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; background: rgba(139, 69, 19, 0.05); width: 100%; transition: 0.2s;">
+                        <span id="remiseIcon"
+                            style="background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">+</span>
+                        Ajouter une remise
+                    </button>
+                    <div id="remiseContainer"
+                        style="display: none; margin-top: 10px; padding: 15px; background: var(--light); border-radius: 12px; border: 1px dashed var(--primary-light);">
+                        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                            <button class="btn btn-sm btn-outline remise-type-btn active" data-type="amount"
+                                style="flex: 1; padding: 8px;">Montant (DA)</button>
+                            <button class="btn btn-sm btn-outline remise-type-btn" data-type="percent"
+                                style="flex: 1; padding: 8px;">Pourcentage (%)</button>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <input type="number" id="remiseValueInput" class="input"
+                                style="text-align: center; font-weight: bold; font-size: 1.2rem;" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="font-weight: 700;">Montant Reçu (DA)</label>
+                    <div style="display: flex; gap: 10px; align-items: stretch;">
+                        <input type="number" id="paymentReceivedInput" class="input"
+                            style="font-size: 1.5rem; text-align: center; font-weight: bold; padding: 12px; border: 2px solid var(--primary-light); flex: 1;"
+                            placeholder="0">
+                        <button type="button" id="exactAmountBtn"
+                            style="padding: 12px 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s;"
+                            title="Saisir le montant exact">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                style="vertical-align: middle; margin-right: 4px;">
+                                <rect width="20" height="12" x="2" y="6" rx="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <path d="M6 12h.01M18 12h.01" />
+                            </svg>
+                            Exact
+                        </button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 15px; padding: 15px; background: #FFF; border: 2px solid var(--light); border-radius: 12px; transition: 0.3s;"
+                    id="changeDisplayBox">
+                    <p class="text-muted" style="font-weight: 600;">Monnaie à Rendre</p>
+                    <div id="paymentChangeDisplay" style="font-size: 2.2rem; font-weight: 800; color: var(--gray);">0,00
+                        DA</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelPaymentBtn">Annuler</button>
+                <button class="btn btn-success w-full" id="confirmPaymentBtn">Valider</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="clientModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="clientModalTitle">👥 Nouveau Client</h3>
+                <button class="modal-close" onclick="closeClientModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editClientId">
+                <div class="form-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="clientNameInput" class="input" placeholder="Ex: Jean Dupont">
+                </div>
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="text" id="clientPhoneInput" class="input" placeholder="Ex: 0555 12 34 56">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-lg btn-outline" onclick="closeClientModal()"
+                    style="margin-right: 10px;">Annuler</button>
+                <button class="btn btn-lg btn-primary" onclick="saveNewClient()" style="flex: 1;">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Divers Modal -->
+    <div id="diversModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"
+                        style="vertical-align: middle; margin-right: 8px;">
+                        <path d="m7.5 4.27 9 5.15" />
+                        <path
+                            d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                        <path d="m3.3 7 8.7 5 8.7-5" />
+                        <path d="M12 22V12" />
+                    </svg>
+                    Article Divers
+                </h3>
+                <button class="modal-close" onclick="closeDiversModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label style="font-weight: 700;">Prix (DA)</label>
+                    <input type="number" id="diversPriceInput" class="input"
+                        style="font-size: 1.5rem; text-align: center; font-weight: bold; padding: 12px; border: 2px solid var(--primary-light);"
+                        placeholder="0"
+                        onkeydown="if(event.key === 'Enter') document.getElementById('diversQtyInput').focus()">
+                </div>
+                <div class="form-group">
+                    <label style="font-weight: 700;">Quantité</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" class="btn btn-outline" onclick="adjustDiversQty(-1)"
+                            style="width: 50px;">-</button>
+                        <input type="number" id="diversQtyInput" class="input" value="1" min="1"
+                            style="font-size: 1.5rem; text-align: center; font-weight: bold; padding: 12px; border: 2px solid var(--primary-light); flex: 1;"
+                            onkeydown="if(event.key === 'Enter') confirmDivers()">
+                        <button type="button" class="btn btn-outline" onclick="adjustDiversQty(1)"
+                            style="width: 50px;">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDiversModal()">Annuler</button>
+                <button class="btn btn-success w-full" onclick="confirmDivers()">Ajouter au Panier</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales History Modal -->
+    <div id="salesHistoryModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 550px; max-height: 85vh; display: flex; flex-direction: column;">
+            <div class="modal-header"
+                style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+                <h3 style="color: white; display: flex; align-items: center; gap: 10px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    Historique des Ventes
+                </h3>
+                <button class="modal-close" onclick="closeSalesHistory()"
+                    style="color: white; border-color: rgba(255,255,255,0.3);">✕</button>
+            </div>
+            <div class="history-filters"
+                style="padding: 12px 16px; background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 8px;">
+                <button class="filter-chip active" data-period="all" onclick="filterHistory('all', this)">Tout</button>
+                <button class="filter-chip" data-period="day" onclick="filterHistory('day', this)">Jour</button>
+                <button class="filter-chip" data-period="week" onclick="filterHistory('week', this)">Semaine</button>
+                <button class="filter-chip" data-period="month" onclick="filterHistory('month', this)">Mois</button>
+                <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+                    <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-light);">PRÉCIS:</span>
+                    <input type="date" id="historyExactDate" onchange="filterHistory('date', this)"
+                        style="border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; font-family: inherit; font-weight: 600; outline: none;">
+                </div>
+            </div>
+            <div
+                style="padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span
+                        style="position: absolute; left: 12px; color: var(--text-light); pointer-events: none;">🔍</span>
+                    <input type="text" id="historySearchInput" placeholder="Rechercher par article..."
+                        oninput="renderSalesHistoryList()"
+                        style="width: 100%; padding: 10px 10px 10px 38px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.85rem; font-family: inherit; font-weight: 600; outline: none; background: #f9f9f9; transition: all 0.2s;">
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 700; color: var(--text-dark); font-size: 0.85rem;">Total Période:</span>
+                    <span id="salesHistoryTotal"
+                        style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">0,00 DA</span>
+                </div>
+            </div>
+            <div id="salesHistoryList"
+                style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Ticket Preview Modal -->
+    <div id="ticketPreviewModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content"
+            style="max-width: 350px; max-height: 90vh; display: flex; flex-direction: column; background: white;">
+            <div class="modal-header"
+                style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border-radius: 16px 16px 0 0; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="color: white; display: flex; align-items: center; gap: 10px; margin: 0;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    Aperçu du Ticket
+                </h3>
+                <button class="modal-close" onclick="closeTicketPreview()"
+                    style="color: white; border-color: rgba(255,255,255,0.3); background: transparent; border: 2px solid rgba(255,255,255,0.3); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;">✕</button>
+            </div>
+
+            <div id="ticketPreviewContent"
+                style="flex: 1; overflow-y: auto; padding: 24px; display: flex; justify-content: center; align-items: flex-start; background: #f9f9f9;">
+                <!-- Ticket content filled by JS -->
+            </div>
+
+            <div
+                style="padding: 16px 24px; background: #fff; border-top: 1px solid var(--border); display: flex; gap: 12px; flex-direction: column;">
+                <button onclick="printFromPreview()"
+                    style="width: 100%; padding: 14px 24px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
+                    </svg>
+                    Imprimer le Ticket
+                </button>
+                <button onclick="closeTicketPreview()"
+                    style="width: 100%; padding: 12px 24px; background: transparent; color: var(--primary); border: 2px solid var(--border); border-radius: 12px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.3s;">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <style>
+        /* Parallel Order Tabs */
+        .parallel-order-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.02);
+            scrollbar-width: none;
+        }
+
+        .parallel-order-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .parallel-tab {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .parallel-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .parallel-tab.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .parallel-tab-count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+        }
+
+        .parallel-tab.active .parallel-tab-count {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .parallel-tab-close {
+            font-size: 1rem;
+            line-height: 1;
+            opacity: 0.5;
+            margin-left: 2px;
+        }
+
+        .parallel-tab-close:hover {
+            opacity: 1;
+        }
+
+        .parallel-tab.hold-btn {
+            background: var(--light);
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .parallel-tab.hold-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Sales History Items */
+        .sales-history-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sales-history-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .sh-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .sh-item-date {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .sh-item-total {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .sh-item-details {
+            font-size: 0.8rem;
+            color: var(--text-medium);
+            line-height: 1.4;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .sh-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sh-item-client {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .sh-reprint-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border: 1px solid var(--primary-light);
+            border-radius: 20px;
+            background: rgba(74, 44, 42, 0.05);
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .sh-reprint-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sh-reprint-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .sh-return-btn {
+            border-color: #f59e0b;
+            color: #92400e;
+            background: #fffbeb;
+        }
+
+        .sh-cancel-btn {
+            border-color: #fecaca;
+            color: #b91c1c;
+            background: #fef2f2;
+        }
+
+        /* Filter Chips */
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            background: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .filter-chip:hover:not(.active) {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+    </style>
+
+    <script src="js/app.js"></script>
+    <script src="js/virtual-keyboard.js"></script>
+    <script>
+        // Toggle Client Panel Logic
+        document.getElementById('toggleClientPanelBtn')?.addEventListener('click', function () {
+            const panel = document.getElementById('compactClientPanel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                this.classList.add('active');
+            } else {
+                panel.style.display = 'none';
+                this.classList.remove('active');
+            }
+        });
+    </script>
+    <script src="js/branding.js"></script>
+</body>
+
+</html>

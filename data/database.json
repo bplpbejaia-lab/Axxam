@@ -1,0 +1,323 @@
+{
+    "categories": [
+        {
+            "id": 1776335470463,
+            "name": "BF",
+            "image": "",
+            "color": "#8b4513"
+        }
+    ],
+    "products": [
+        {
+            "id": 1776335486614,
+            "name": "ed",
+            "category": 1776335470463,
+            "price": 11,
+            "purchasePrice": 0,
+            "stock": -10,
+            "minStock": 10,
+            "expiryDate": "",
+            "image": "bibliotheque image/jux.png",
+            "isFavorite": false
+        },
+        {
+            "id": 1776856598843,
+            "name": "aa",
+            "category": 1776335470463,
+            "price": 3,
+            "purchasePrice": 1,
+            "stock": -1,
+            "minStock": 10,
+            "expiryDate": "",
+            "image": "",
+            "isFavorite": false
+        },
+        {
+            "id": 1776856608283,
+            "name": "DFGDF",
+            "category": 1776335470463,
+            "price": 0,
+            "purchasePrice": 0,
+            "stock": -1,
+            "minStock": 10,
+            "expiryDate": "",
+            "image": "",
+            "isFavorite": false
+        },
+        {
+            "id": 1776856620851,
+            "name": "DHDGHGFX",
+            "category": 1776335470463,
+            "price": 0,
+            "purchasePrice": 0,
+            "stock": 0,
+            "minStock": 10,
+            "expiryDate": "",
+            "image": "",
+            "isFavorite": false
+        },
+        {
+            "id": 1776856636451,
+            "name": "A",
+            "category": 1776335470463,
+            "price": 0,
+            "purchasePrice": 1,
+            "stock": 0,
+            "minStock": 10,
+            "expiryDate": "",
+            "image": "",
+            "isFavorite": false
+        }
+    ],
+    "adjustments": [
+        {
+            "id": 1776856644012.3516,
+            "productId": 1776856598843,
+            "quantity": -1,
+            "reason": "Vente",
+            "date": "2026-04-22T11:17:24.012Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776856644012.5422,
+            "productId": 1776856608283,
+            "quantity": -1,
+            "reason": "Vente",
+            "date": "2026-04-22T11:17:24.012Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776856644012.5906,
+            "productId": 1776335486614,
+            "quantity": -2,
+            "reason": "Vente",
+            "date": "2026-04-22T11:17:24.012Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776338214253.794,
+            "productId": 1776335486614,
+            "quantity": -4,
+            "reason": "Vente",
+            "date": "2026-04-16T11:16:54.253Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776338182557.7185,
+            "productId": 1776335486614,
+            "quantity": -1,
+            "reason": "Vente",
+            "date": "2026-04-16T11:16:22.557Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776335890958.6384,
+            "productId": 1776335486614,
+            "quantity": -1,
+            "reason": "Vente",
+            "date": "2026-04-16T10:38:10.958Z",
+            "user": "POS"
+        },
+        {
+            "id": 1776335491205.7207,
+            "productId": 1776335486614,
+            "quantity": -2,
+            "reason": "Vente",
+            "date": "2026-04-16T10:31:31.205Z",
+            "user": "POS"
+        }
+    ],
+    "orders": [
+        {
+            "id": 1776856644012,
+            "ticketNum": 1,
+            "clientId": "divers",
+            "items": [
+                {
+                    "productId": 1776335486614,
+                    "quantity": 2,
+                    "price": 11,
+                    "unitCost": 0
+                },
+                {
+                    "productId": 1776856608283,
+                    "quantity": 1,
+                    "price": 0,
+                    "unitCost": 0
+                },
+                {
+                    "productId": 1776856598843,
+                    "quantity": 1,
+                    "price": 0,
+                    "unitCost": 0
+                }
+            ],
+            "total": 22,
+            "discount": 0,
+            "originalTotal": 22,
+            "date": "2026-04-22T11:17:24.012Z",
+            "payment": null
+        },
+        {
+            "id": 1776338214253,
+            "ticketNum": 4,
+            "clientId": "divers",
+            "items": [
+                {
+                    "productId": 1776335486614,
+                    "quantity": 4,
+                    "price": 11,
+                    "unitCost": 0
+                }
+            ],
+            "total": 44,
+            "discount": 0,
+            "originalTotal": 44,
+            "date": "2026-04-16T11:16:54.253Z",
+            "payment": {
+                "received": 44,
+                "change": 0
+            }
+        },
+        {
+            "id": 1776338182557,
+            "ticketNum": 3,
+            "clientId": "divers",
+            "items": [
+                {
+                    "productId": 1776335486614,
+                    "quantity": 1,
+                    "price": 0,
+                    "unitCost": 0
+                }
+            ],
+            "total": 0,
+            "discount": 0,
+            "originalTotal": 0,
+            "date": "2026-04-16T11:16:22.557Z",
+            "payment": null
+        },
+        {
+            "id": 1776335890958,
+            "ticketNum": 2,
+            "clientId": "divers",
+            "items": [
+                {
+                    "productId": 1776335486614,
+                    "quantity": 1,
+                    "price": 0,
+                    "unitCost": 0
+                }
+            ],
+            "total": 0,
+            "discount": 0,
+            "originalTotal": 0,
+            "date": "2026-04-16T10:38:10.958Z",
+            "payment": null
+        },
+        {
+            "id": 1776335491206,
+            "ticketNum": 1,
+            "clientId": "divers",
+            "items": [
+                {
+                    "productId": 1776335486614,
+                    "quantity": 2,
+                    "price": 0,
+                    "unitCost": 0
+                }
+            ],
+            "total": 0,
+            "discount": 0,
+            "originalTotal": 0,
+            "date": "2026-04-16T10:31:31.206Z",
+            "payment": null
+        }
+    ],
+    "withdrawals": [],
+    "components": [
+        {
+            "id": 1,
+            "name": "aa",
+            "unit": "kg",
+            "icon": "📦",
+            "minStock": 0,
+            "imageUrl": null
+        }
+    ],
+    "lots": [
+        {
+            "id": 1776858699028,
+            "componentId": 1,
+            "quantity": 10.5,
+            "remainingQty": 10.5,
+            "totalPrice": 137.55,
+            "date": "2026-04-22",
+            "supplier": "",
+            "createdAt": "2026-04-22T11:51:39.028Z"
+        },
+        {
+            "id": 1776858791348,
+            "componentId": 1,
+            "quantity": 12,
+            "remainingQty": 12,
+            "totalPrice": 256.8,
+            "date": "2026-04-22",
+            "supplier": "",
+            "createdAt": "2026-04-22T11:53:11.348Z"
+        }
+    ],
+    "recipes": [
+        {
+            "productId": 1776856598843,
+            "ingredients": [
+                {
+                    "componentId": 1,
+                    "quantity": 0.1,
+                    "lotId": null,
+                    "unitType": "component"
+                }
+            ],
+            "unitsDivisor": 1
+        },
+        {
+            "productId": 1776856608283,
+            "ingredients": [
+                {
+                    "componentId": 1776856598843,
+                    "quantity": 1,
+                    "lotId": null,
+                    "unitType": "productUnit"
+                }
+            ],
+            "unitsDivisor": 1
+        }
+    ],
+    "customerOrders": [],
+    "clientAccounts": [],
+    "invoices": [],
+    "suppliers": [],
+    "purchaseOrders": [],
+    "purchaseInvoices": [],
+    "settings": {
+        "openDrawerOnWithdrawal": true,
+        "tva": "",
+        "contact": "",
+        "initialCash": 0,
+        "costCalcMethod": "wavg",
+        "printerName": "",
+        "printerFormat": "90mm",
+        "autoPrint": false,
+        "openDrawerOnSale": false
+    },
+    "clients": [
+        {
+            "id": "divers",
+            "name": "Vente",
+            "phone": "-",
+            "email": "-"
+        }
+    ],
+    "productions": [],
+    "recurringProductions": []
+}

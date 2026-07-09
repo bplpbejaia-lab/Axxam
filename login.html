@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Axxam</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/extra.css">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-card">
+        <div class="auth-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" style="width:32px; height:32px;">
+                <rect x="2" y="3" width="20" height="18" rx="3" />
+                <line x1="8" y1="3" x2="8" y2="21" />
+                <line x1="16" y1="3" x2="16" y2="21" />
+                <line x1="2" y1="9" x2="22" y2="9" />
+                <line x1="2" y1="15" x2="22" y2="15" />
+            </svg>
+        </div>
+        <p class="company-tag-login">Axxam</p>
+        <h1 class="auth-title">Axxam</h1>
+        <p class="auth-subtitle">Veuillez vous authentifier pour continuer</p>
+
+        <form id="loginForm" class="auth-form">
+            <div class="form-group">
+                <label for="username">Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" placeholder="Entrez votre identifiant" required
+                    autocomplete="username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+
+            <button type="submit" class="btn-auth">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" style="width:18px; height:18px; vertical-align: middle; margin-right: 8px;">
+                    <rect x="2" y="3" width="20" height="18" rx="3" />
+                    <line x1="8" y1="3" x2="8" y2="21" />
+                    <line x1="16" y1="3" x2="16" y2="21" />
+                    <line x1="2" y1="9" x2="22" y2="9" />
+                    <line x1="2" y1="15" x2="22" y2="15" />
+                </svg>
+                Se Connecter
+            </button>
+        </form>
+
+        <p id="errorMsg" style="color: var(--danger); margin-top: 15px; font-weight: 600; display: none;"></p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/virtual-keyboard.js"></script>
+    <script src="js/branding.js"></script>
+    <script>
+        // Init logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if already logged in
+            const user = authService.getCurrentUser();
+            if (user) {
+                window.location.href = authService.getHomePage(user);
+            }
+
+            const form = document.getElementById('loginForm');
+            const errorMsg = document.getElementById('errorMsg');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = form.username.value;
+                const password = form.password.value;
+
+                console.log("Attempting login for:", username);
+
+                // Use the authService
+                const result = authService.login(username, password);
+
+                if (result.success) {
+                    console.log("Login success:", result.user);
+                    window.location.href = authService.getHomePage(result.user);
+                } else {
+                    console.error("Login failed:", result.message);
+                    errorMsg.textContent = result.message;
+                    errorMsg.style.display = 'block';
+                    form.classList.add('shake');
+                    setTimeout(() => form.classList.remove('shake'), 500);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

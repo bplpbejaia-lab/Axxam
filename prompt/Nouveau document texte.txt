@@ -1,0 +1,2 @@
+C:\Users\GSS1\Documents\AXXAM V8 quand jutilise un produit comme un composant dans une autre recette son cout de ce produit nest pas correctement importé comme tu vois son cout affiche 0.46 dans sa recette et devenu 46 ici meme ci j'ai utilisé juste une unité
+

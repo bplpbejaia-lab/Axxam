@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock - Axxam</title>
+    <meta name="description" content="Gestion du stock - Axxam">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/extra.css">
+    <script src="js/auth.js"></script>
+    <script>authService.checkAuth('admin');</script>
+    <style>
+        /* FIX: Force grid display for products to prevent empty view */
+        .products-grid-full {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            padding-bottom: 40px;
+            overflow: visible !important;
+            /* Fix double scroll */
+            max-height: none !important;
+            /* Fix double scroll */
+        }
+
+        .cart-panel {
+            width: 20% !important;
+            /* Reduced width to leave more space for products */
+            min-width: 220px !important;
+            flex: none !important;
+        }
+
+        .products-section {
+            flex: 1 !important;
+        }
+
+        .product-card {
+            min-height: 160px !important;
+            /* Reduced card height for tighter layout */
+        }
+
+        .product-image {
+            height: 60px !important;
+        }
+
+
+        /* Touch-friendly scroll improvements */
+        .inventory-scroll-container {
+            padding: 10px;
+            padding-bottom: 80px;
+            overflow-y: auto;
+            flex: 1;
+            width: 100%;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+        }
+
+        /* Larger touch targets and spacing for product cards in inventory */
+        .inventory-scroll-container .product-card {
+            touch-action: manipulation;
+            min-height: 160px !important;
+        }
+
+        /* Increase gap between cards on touch screens */
+        @media (pointer: coarse) {
+            .inventory-scroll-container .products-grid-full {
+                gap: 24px !important;
+                padding: 8px;
+            }
+
+            .inventory-scroll-container .product-card {
+                padding-bottom: 8px;
+            }
+        }
+        /* Full-page modal styles */
+        .modal-overlay.full-page {
+            background: var(--bg-main) !important;
+            padding: 0 !important;
+            align-items: flex-start !important;
+            overflow-y: auto !important;
+        }
+ 
+        .modal-overlay.full-page .modal-content {
+            width: 100% !important;
+            max-width: none !important;
+            height: 100% !important;
+            min-height: 100vh !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            display: flex;
+            flex-direction: column;
+            margin: 0 !important;
+            overflow: hidden !important; /* Prevent double scroll on content */
+        }
+
+        .modal-overlay.full-page .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            padding: 15px 20px;
+        }
+
+        .modal-overlay.full-page .modal-body,
+        .modal-overlay.full-page form {
+            flex: 1;
+            padding: 20px 30px;
+            padding-bottom: 250px !important; /* Increased significantly for keyboard and visibility */
+            overflow-y: auto;
+        }
+
+        .modal-overlay.full-page .modal-footer {
+            position: sticky; /* Changed from fixed to sticky or just ensure it has z-index */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 12px;
+            z-index: 101;
+            margin-top: auto; /* Push to bottom if content is short */
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Adjustments for inputs in full page to be large and clear */
+        .modal-overlay.full-page .input {
+            font-size: 1.1rem !important;
+            padding: 14px 18px !important;
+        }
+
+        .modal-overlay.full-page label {
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            margin-bottom: 10px !important;
+        }
+
+        /* Ensure form content is scollable above the keyboard */
+        body.keyboard-active .modal-overlay.full-page .modal-body,
+        body.keyboard-active .modal-overlay.full-page form {
+            padding-bottom: 300px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Modern Navbar -->
+        <header class="top-navbar">
+            <div class="navbar-brand">
+                <div class="navbar-logo-wrapper">
+                    <div class="navbar-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="18" rx="3" />
+                            <line x1="8" y1="3" x2="8" y2="21" />
+                            <line x1="16" y1="3" x2="16" y2="21" />
+                            <line x1="2" y1="9" x2="22" y2="9" />
+                            <line x1="2" y1="15" x2="22" y2="15" />
+                        </svg>
+                    </div>
+                    <span class="company-tag">Axxam</span>
+                </div>
+                <h1 class="navbar-title">Axxam</h1>
+            </div>
+
+            <nav class="navbar-nav">
+                <a href="index.html" class="navbar-link" title="Ventes" aria-label="Ventes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    <span>Ventes</span>
+                </a>
+                <a href="withdrawals.html" class="navbar-link" title="Caisse" aria-label="Caisse">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                    <span>Caisse</span>
+                </a>
+                <a href="inventory.html" class="navbar-link active" title="Stock" aria-label="Stock">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                    <span>Stock</span>
+                </a>
+                <a href="achats.html" class="navbar-link" title="Achats" aria-label="Achats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                    <span>Achats</span>
+                </a>
+                <a href="commandes.html" class="navbar-link" title="Commandes" aria-label="Commandes">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11h6"/><path d="M9 15h6"/><path d="M8 3h8l2 3v15H6V6z"/><path d="M8 3v3h10"/></svg>
+                    <span>Commandes</span>
+                </a>
+                <a href="stats.html" class="navbar-link" title="Stats" aria-label="Stats">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                    <span>Stats</span>
+                </a>
+                <a href="categories.html" class="navbar-link" title="Categories" aria-label="Categories">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5 6.3 6.3a2.8 2.8 0 0 1 0 4L15 21"/><path d="m7 5 6.3 6.3a2.8 2.8 0 0 1 0 4L7 21"/><path d="M2 13.5V5a3 3 0 0 1 3-3h8.5"/><circle cx="7" cy="7" r="1"/></svg>
+                    <span>Categories</span>
+                </a>
+                <a href="settings.html" class="navbar-link" title="Parametres" aria-label="Parametres">
+                    <svg class="navbar-icon" viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <span>Parametres</span>
+                </a>
+            </nav>
+
+            <div class="navbar-actions">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Rechercher..." id="searchInput">
+                </div>
+
+                <button class="btn btn-outline" id="reorderBtn" onclick="toggleReorderMode()" title="Réorganiser les produits">
+                    🔃 <span class="btn-text">Réorganiser</span>
+                </button>
+
+                <button class="btn btn-accent" id="addProductBtn">
+                    + <span class="btn-text">Produit</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-area">
+            <main class="products-section">
+                <!-- Category Filters -->
+                <div class="category-bar">
+                    <div class="category-pills" id="categoryFilters">
+                        <!-- Filters generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="inventory-scroll-container" id="inventoryScrollArea">
+                    <div style="margin-bottom: 10px; color: var(--text-light);">
+                        Ref: <span id="totalProducts">0</span> produits
+                    </div>
+                    <div id="productsGridInventory" class="products-grid-full"></div>
+                </div>
+
+                <!-- Scroll Buttons for Stock -->
+                <div class="scroll-nav-container" style="bottom: 30px; right: 30px;">
+                    <button class="scroll-nav-btn"
+                        onclick="document.getElementById('inventoryScrollArea').scrollBy({top: -400, behavior: 'smooth'})"
+                        title="Vers le haut">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 15l-6-6-6 6" />
+                        </svg>
+                    </button>
+                    <button class="scroll-nav-btn"
+                        onclick="document.getElementById('inventoryScrollArea').scrollBy({top: 400, behavior: 'smooth'})"
+                        title="Vers le bas">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </button>
+                </div>
+            </main>
+
+            <!-- Alerts & Quick Add Panel -->
+            <aside class="cart-panel">
+                <!-- Alerts Header -->
+                <div class="cart-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    <h3>Alertes Stock</h3>
+                </div>
+                <div id="alertsContainer" style="flex: 1; overflow-y: auto; padding: var(--space-md);"></div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Add Product Modal (Full Page) -->
+    <div id="productModal" class="modal-overlay full-page">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📦 Nouveau Produit</h3>
+                <button class="modal-close" id="closeModal">✕</button>
+            </div>
+            <form id="productForm">
+                <!-- Image Source Tabs -->
+                <div class="image-source-tabs">
+                    <button type="button" class="image-source-tab active" data-source="library">📚 Bibliothèque</button>
+                    <button type="button" class="image-source-tab" data-source="upload">📤 Fichier externe</button>
+                </div>
+
+                <!-- Library Images -->
+                <div id="imageLibrarySection">
+                    <div class="image-library-grid" id="imageLibraryGrid"></div>
+                </div>
+
+                <!-- File Upload (Hidden by default) -->
+                <div id="imageUploadSection" style="display: none;">
+                    <div class="image-upload-area mb-md" id="imageUploadArea"
+                        onclick="document.getElementById('productImageFile').click()">
+                        <input type="file" id="productImageFile" accept="image/*">
+                        <div id="imagePreviewContainer">
+                            <span class="upload-icon">📷</span>
+                            <p class="text-sm text-muted">Cliquez pour ajouter une image externe</p>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="productImage">
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nom du produit</label>
+                        <input type="text" class="input" id="productName" required placeholder="Ex: Cappuccino">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Code-barres / Code produit</label>
+                        <input type="text" class="input" id="productBarcode" placeholder="Scanner ou saisir le code">
+                    </div>
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select class="input" id="productCategory" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prix de vente (DA)</label>
+                        <input type="number" step="1" class="input" id="productPrice" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Prix d'achat (DA)</label>
+                        <input type="number" step="0.01" class="input" id="productPurchasePrice" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock actuel</label>
+                        <input type="number" class="input" id="productStock" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Date d'expiration</label>
+                        <input type="date" class="input" id="productExpiryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock minimum</label>
+                        <input type="number" class="input" id="productMinStock" required placeholder="10">
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelModal">Annuler</button>
+                <button type="submit" class="btn btn-primary" form="productForm">✓ Ajouter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal (Full Page) -->
+    <div id="editStockModal" class="modal-overlay full-page">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Modifier le produit</h3>
+                <button class="modal-close" id="closeEditStockModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <!-- Image Source Tabs for Edit -->
+                <div class="image-source-tabs">
+                    <button type="button" class="image-source-tab active" data-source="library">📚 Bibliothèque</button>
+                    <button type="button" class="image-source-tab" data-source="upload">📤 Fichier externe</button>
+                </div>
+
+                <!-- Library Images for Edit -->
+                <div id="editImageLibrarySection">
+                    <div class="image-library-grid" id="editImageLibraryGrid"></div>
+                </div>
+
+                <!-- File Upload for Edit -->
+                <div id="editImageUploadSection" style="display: none;">
+                    <div class="image-upload-area mb-md" id="editImageUploadArea"
+                        onclick="document.getElementById('editProductImageFile').click()">
+                        <input type="file" id="editProductImageFile" accept="image/*">
+                        <div id="editImagePreviewContainer">
+                            <span class="upload-icon">📷</span>
+                            <p class="text-sm text-muted">Cliquez pour modifier l''image</p>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" id="editProductImage">
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nom du produit</label>
+                        <input type="text" class="input" id="editProductNameInput" required
+                            placeholder="Nom du produit">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Code-barres / Code produit</label>
+                        <input type="text" class="input" id="editProductBarcode" placeholder="Scanner ou saisir le code">
+                    </div>
+                    <div class="form-group">
+                        <label>Catégorie</label>
+                        <select class="input" id="editProductCategory" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Prix de vente (DA)</label>
+                        <input type="number" step="1" class="input" id="editProductPrice" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Prix d'achat (DA)</label>
+                        <input type="number" step="0.01" class="input" id="editProductPurchasePrice" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock actuel</label>
+                        <input type="number" class="input" id="editNewStock" required placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Date d'expiration</label>
+                        <input type="date" class="input" id="editProductExpiryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Stock minimum</label>
+                        <input type="number" class="input" id="editProductMinStock" required placeholder="10">
+                    </div>
+                </div>
+                <input type="hidden" id="editProductId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelEditStockBtn">Annuler</button>
+                <button type="button" class="btn btn-danger" id="deleteProductBtn" style="margin-right: auto;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                    Supprimer
+                </button>
+                <button type="button" class="btn btn-primary" id="saveEditStockBtn">✓ Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expired Stock Custom Modal -->
+    <div id="expiredStockModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>⌛ Retirer stock expiré</h3>
+                <button class="modal-close" id="closeExpiredModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="expiredProductName" class="font-bold mb-md"></p>
+                <div class="form-group">
+                    <label>Quantité à retirer</label>
+                    <input type="number" id="expiredQtyInput" class="input" value="1" min="1">
+                </div>
+                <input type="hidden" id="expiredProductId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelExpiredBtn">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmExpiredBtn">✓ Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add Stock Modal -->
+    <div id="quickAddStockModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>📦 Ajouter du Stock</h3>
+                <button class="modal-close" id="closeQuickAddModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; margin-bottom: var(--space-md);">
+                    <img id="quickAddProductImage" src="" alt=""
+                        style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover; margin-bottom: 10px;">
+                    <h4 id="quickAddProductName" style="margin: 0; color: var(--primary);"></h4>
+                    <p id="quickAddCurrentStock" style="font-size: 0.9rem; color: var(--text-light); margin-top: 4px;">
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label style="font-weight: 700;">Quantité à ajouter</label>
+                    <input type="number" id="quickAddQtyInput" class="input" value="1" min="1"
+                        style="font-size: 1.5rem; text-align: center; font-weight: bold; border: 2px solid var(--primary-light);">
+                </div>
+                <input type="hidden" id="quickAddProductId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelQuickAddBtn" style="flex: 1;">Annuler</button>
+                <button type="button" class="btn btn-success" id="confirmQuickAddBtn" style="flex: 2;">✓ Ajouter au
+                    Stock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>⚠️ Confirmer la suppression</h3>
+                <button class="modal-close" id="closeDeleteConfirm">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteConfirmText">Voulez-vous supprimer ce produit ?</p>
+                <input type="hidden" id="deleteTargetProductId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+
+
+    <script src="js/app.js"></script>
+    <script src="js/virtual-keyboard.js"></script>
+    <script src="js/branding.js"></script>
+    <script>
+        // Image Library Data
+        const imageLibrary = [
+            { name: 'Café', path: 'bibliotheque image/caffee.png' },
+            { name: 'Crème', path: 'bibliotheque image/crem.png' },
+            { name: 'Croissant', path: 'bibliotheque image/croison.png' },
+            { name: 'Gâteau', path: 'bibliotheque image/gateau.png' },
+            { name: 'Jus', path: 'bibliotheque image/jux.png' },
+            { name: 'Madeleine', path: 'bibliotheque image/madlin.png' },
+            { name: 'Petit Pain', path: 'bibliotheque image/petit pain.webp' },
+            { name: 'Pizza', path: 'bibliotheque image/pizza carré.jpg' },
+            { name: 'Smoothie', path: 'bibliotheque image/smoothie.png' },
+            { name: 'Tarte', path: 'bibliotheque image/tatre.png' },
+            { name: 'Thé', path: 'bibliotheque image/tee.png' },
+            { name: 'Thé 2', path: 'bibliotheque image/thé.png' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initInventoryPage(); // From app.js
+            initImageLibrary();
+            initImageSourceTabs();
+            // Init Edit Modal is called inside initInventoryPage() -> initProductModal() chain or manually here if needed
+            initEditStockModal();
+            initDeleteConfirmModal();
+
+            // File upload handlers
+            setupFileUpload('productImageFile', 'imageUploadArea', 'imagePreviewContainer', 'productImage');
+            setupFileUpload('editProductImageFile', 'editImageUploadArea', 'editImagePreviewContainer', 'editProductImage');
+        });
+
+        function initImageLibrary() {
+            const grid = document.getElementById('imageLibraryGrid');
+            const editGrid = document.getElementById('editImageLibraryGrid');
+
+            const html = imageLibrary.map(img =>
+                `<div class="image-library-item" data-path="${img.path}" onclick="selectLibraryImage(this, '${img.path}')">
+                    <img src="${img.path}" alt="${img.name}">
+                </div>`
+            ).join('');
+
+            const editHtml = imageLibrary.map(img =>
+                `<div class="image-library-item" data-path="${img.path}" onclick="selectEditLibraryImage(this, '${img.path}')">
+                    <img src="${img.path}" alt="${img.name}">
+                </div>`
+            ).join('');
+
+            if (grid) grid.innerHTML = html;
+            if (editGrid) editGrid.innerHTML = editHtml;
+        }
+
+        function selectLibraryImage(el, path) {
+            document.querySelectorAll('#imageLibraryGrid .image-library-item').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('productImage').value = path;
+        }
+
+        function selectEditLibraryImage(el, path) {
+            document.querySelectorAll('#editImageLibraryGrid .image-library-item').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('editProductImage').value = path;
+        }
+
+        function initImageSourceTabs() {
+            document.querySelectorAll('.image-source-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const parent = this.closest('.modal-content');
+                    parent.querySelectorAll('.image-source-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const source = this.dataset.source;
+                    const isEdit = parent.querySelector('#editImageLibrarySection');
+
+                    const libId = isEdit ? 'editImageLibrarySection' : 'imageLibrarySection';
+                    const upId = isEdit ? 'editImageUploadSection' : 'imageUploadSection';
+
+                    document.getElementById(libId).style.display = source === 'library' ? 'block' : 'none';
+                    document.getElementById(upId).style.display = source === 'upload' ? 'block' : 'none';
+                });
+            });
+        }
+
+        function setupFileUpload(inputId, areaId, previewId, valueId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            input.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById(areaId).classList.add('has-image');
+                        document.getElementById(previewId).innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        document.getElementById(valueId).value = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
