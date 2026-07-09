@@ -9,6 +9,7 @@ const DATA_DIR = path.join(ROOT, 'data');
 const DB_FILE = path.join(DATA_DIR, 'axxam.sqlite');
 const SEED_FILE = path.join(DATA_DIR, 'database.json');
 const PORT = Number(process.env.PORT) || 5173;
+const HOST = process.env.HOST || '0.0.0.0';
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -519,7 +520,7 @@ const server = http.createServer(async (req, res) => {
     if (!handled) serveStatic(res, url);
 });
 
-server.listen(PORT, () => {
-    console.log(`Axxam lancee: http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+    console.log(`Axxam lancee: http://${HOST}:${PORT}`);
     console.log(`Base SQLite: ${DB_FILE}`);
 });
