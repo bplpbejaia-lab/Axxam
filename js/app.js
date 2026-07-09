@@ -1104,18 +1104,30 @@ function renderClientBalances() {
         return;
     }
 
-    container.innerHTML = rows.map(({ client, balance }) => `
-        <article class="finance-balance-row">
-            <div>
-                <strong>${escapeHtml(client.name)}</strong>
-                <span>${escapeHtml(client.phone || '-')}</span>
-            </div>
-            <div class="finance-balance-actions">
-                <strong>${formatPrice(balance)}</strong>
-                <button class="btn btn-sm btn-outline" onclick="showClientStatement('${escapeHtml(client.id)}')">Etat</button>
-            </div>
-        </article>
-    `).join('');
+    container.innerHTML = `
+        <div class="finance-table-wrap">
+            <table class="finance-public-table">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Telephone</th>
+                        <th>Solde</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows.map(({ client, balance }) => `
+                        <tr>
+                            <td><strong>${escapeHtml(client.name)}</strong></td>
+                            <td>${escapeHtml(client.phone || '-')}</td>
+                            <td><span class="finance-table-amount">${formatPrice(balance)}</span></td>
+                            <td><button class="btn btn-sm btn-outline" onclick="showClientStatement('${escapeHtml(client.id)}')">Etat</button></td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function renderInvoices() {
@@ -1452,32 +1464,47 @@ function renderSuppliers() {
         return;
     }
 
-    container.innerHTML = suppliers.map(supplier => {
+    container.innerHTML = `
+        <div class="finance-table-wrap">
+            <table class="finance-public-table">
+                <thead>
+                    <tr>
+                        <th>Fournisseur</th>
+                        <th>Contact</th>
+                        <th>Total achats</th>
+                        <th>Retours</th>
+                        <th>Reste</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${suppliers.map(supplier => {
         const summary = getSupplierFinanceSummary(supplier.id);
         return `
-        <article class="finance-card finance-supplier-card">
-            <div class="finance-card-head">
-                <div>
-                    <h3>${escapeHtml(supplier.name)}</h3>
-                    <p>${escapeHtml(supplier.phone || '-')} ${supplier.email ? '- ' + escapeHtml(supplier.email) : ''}</p>
-                    ${supplier.address ? `<p>${escapeHtml(supplier.address)}</p>` : ''}
-                </div>
-                <span class="finance-status">${summary.balance > 0 ? formatPrice(summary.balance) : 'Solde OK'}</span>
-            </div>
-            <div class="finance-amount-grid supplier">
-                <div><span>Total achats</span><strong>${formatPrice(summary.total)}</strong></div>
-                <div><span>Retours</span><strong>${formatPrice(summary.returns)}</strong></div>
-                <div><span>Reste</span><strong>${formatPrice(summary.balance)}</strong></div>
-            </div>
-            <div class="finance-actions">
-                <button class="btn btn-sm btn-primary" onclick="showSupplierStatement('${supplier.id}')">Etat / solde</button>
-                <button class="btn btn-sm btn-outline" onclick="paySupplierOldestInvoice('${supplier.id}')" ${summary.balance <= 0 ? 'disabled' : ''}>Payer</button>
-                <button class="btn btn-sm btn-outline" onclick="editSupplier('${supplier.id}')">Modifier</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">Supprimer</button>
-            </div>
-        </article>
+                            <tr>
+                                <td>
+                                    <strong>${escapeHtml(supplier.name)}</strong>
+                                    ${supplier.address ? `<span>${escapeHtml(supplier.address)}</span>` : ''}
+                                </td>
+                                <td>${escapeHtml(supplier.phone || '-')} ${supplier.email ? `<span>${escapeHtml(supplier.email)}</span>` : ''}</td>
+                                <td>${formatPrice(summary.total)}</td>
+                                <td>${formatPrice(summary.returns)}</td>
+                                <td><span class="finance-table-amount ${summary.balance > 0 ? 'danger' : 'ok'}">${summary.balance > 0 ? formatPrice(summary.balance) : 'Solde OK'}</span></td>
+                                <td>
+                                    <div class="finance-table-actions">
+                                        <button class="btn btn-sm btn-primary" onclick="showSupplierStatement('${supplier.id}')">Etat</button>
+                                        <button class="btn btn-sm btn-outline" onclick="paySupplierOldestInvoice('${supplier.id}')" ${summary.balance <= 0 ? 'disabled' : ''}>Payer</button>
+                                        <button class="btn btn-sm btn-outline" onclick="editSupplier('${supplier.id}')">Modifier</button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">Supprimer</button>
+                                    </div>
+                                </td>
+                            </tr>
     `;
-    }).join('');
+    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function saveSupplier(event) {
