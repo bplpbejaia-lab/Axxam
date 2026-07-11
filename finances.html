@@ -183,14 +183,18 @@
                             <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                             <input id="financeInvoiceSearch" type="search" placeholder="Numero, client ou objet..." autocomplete="off">
                         </label>
-                        <select class="input finance-status-filter" id="financeInvoiceFilter" aria-label="Filtrer les factures">
-                            <option value="open">Factures ouvertes</option>
-                            <option value="all">Toutes les factures</option>
-                            <option value="unpaid">Non payees</option>
-                            <option value="partial">Partiellement payees</option>
-                            <option value="paid">Payees</option>
-                            <option value="cancelled">Annulees</option>
-                        </select>
+                        <label class="finance-filter-control" for="financeInvoiceFilter">
+                            <svg class="finance-filter-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l-6 7v5l-4 2v-7Z"/></svg>
+                            <select id="financeInvoiceFilter" aria-label="Filtrer les factures">
+                                <option value="open">Factures ouvertes</option>
+                                <option value="all">Toutes les factures</option>
+                                <option value="unpaid">Non payees</option>
+                                <option value="partial">Partiellement payees</option>
+                                <option value="paid">Payees</option>
+                                <option value="cancelled">Annulees</option>
+                            </select>
+                            <svg class="finance-filter-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                        </label>
                     </div>
                     <div id="financeInvoicesList" class="finance-records-list"></div>
                 </section>
