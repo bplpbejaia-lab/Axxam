@@ -148,7 +148,7 @@ class AuthService {
             { href: 'achats.html', label: 'Achats', icon: 'M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6ZM3 6h18M16 10a4 4 0 0 1-8 0', pages: ['achats.html'] },
             { href: 'withdrawals.html', label: 'Caisse', icon: 'M2 6h20v12H2zM6 12h.01M18 12h.01M12 12h.01', pages: ['withdrawals.html'] },
             { href: 'categories.html', label: 'Categories', icon: 'M15 5 21.3 11.3a2.8 2.8 0 0 1 0 4L15 21M7 5l6.3 6.3a2.8 2.8 0 0 1 0 4L7 21M2 13.5V5a3 3 0 0 1 3-3h8.5M7 7h.01', pages: ['categories.html'] },
-            { href: 'settings.html', label: 'Utilisateurs', icon: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 7a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75', pages: ['settings.html'] }
+            { href: 'settings.html', label: 'Parametres', icon: 'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z', pages: ['settings.html'] }
         ];
 
         if (brand) {
@@ -206,7 +206,7 @@ class AuthService {
             'achats.html': ['Achats', 'Bons, factures et retours fournisseurs'],
             'withdrawals.html': ['Caisse', 'Retraits et mouvements'],
             'categories.html': ['Categories', 'Organisation du catalogue'],
-            'settings.html': ['Utilisateurs', 'Parametres et acces']
+            'settings.html': ['Parametres', 'Utilisateurs, securite et donnees']
         };
         const [title, subtitle] = titles[page] || ['Dashboard', 'Administration'];
         const sourceActions = document.querySelector('.top-navbar > .navbar-actions');

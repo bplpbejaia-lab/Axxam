@@ -73,140 +73,293 @@
         </header>
 
         <div class="main-area page-main">
-            <main class="page-surface finance-page">
+            <main class="page-surface finance-page finance-premium-page">
                 <section class="commandes-hero finance-hero">
                     <div>
                         <p class="page-eyebrow">Finances</p>
-                        <h2>Factures, soldes et fournisseurs</h2>
-                        <p>Suivez les impayes clients, encaissez les reglements et preparez vos bons de commande fournisseurs.</p>
+                        <h2>Clients et fournisseurs</h2>
+                        <p>Consultez les soldes, paiements, factures et commandes depuis un seul espace.</p>
                     </div>
                 </section>
 
-                <section class="finance-stats">
-                    <div class="finance-stat">
-                        <span>Solde client impaye</span>
-                        <strong id="financeTotalReceivable">0,0 DA</strong>
-                    </div>
-                    <div class="finance-stat">
-                        <span>Factures ouvertes</span>
-                        <strong id="financeUnpaidInvoices">0</strong>
-                    </div>
-                    <div class="finance-stat">
-                        <span>Clients debiteurs</span>
-                        <strong id="financeClientsWithBalance">0</strong>
-                    </div>
-                    <div class="finance-stat">
-                        <span>Solde fournisseurs</span>
-                        <strong id="financeSupplierPayable">0,0 DA</strong>
-                    </div>
-                    <div class="finance-stat">
-                        <span>Bons en cours</span>
-                        <strong id="financeOpenPurchaseOrders">0</strong>
-                    </div>
-                </section>
-
-                <section class="finance-grid finance-grid-two">
-                    <article class="finance-panel">
-                        <div class="finance-section-head">
-                            <div>
-                                <p class="page-eyebrow">Clients</p>
-                                <h3>Soldes a recevoir</h3>
-                            </div>
+                <section class="finance-stats finance-overview" aria-label="Vue financiere">
+                    <article class="finance-stat finance-stat-receivable">
+                        <div class="finance-stat-copy">
+                            <span>A recevoir des clients</span>
+                            <strong id="financeTotalReceivable">0,0 DA</strong>
+                            <small><b id="financeClientsWithBalance">0</b> client(s) avec un solde</small>
                         </div>
-                        <div id="financeClientBalances" class="finance-list compact"></div>
+                        <span class="finance-stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                        </span>
                     </article>
-
-                    <article class="finance-panel">
-                        <div class="finance-section-head">
-                            <div>
-                                <p class="page-eyebrow">Nouvelle facture</p>
-                                <h3>Facture manuelle</h3>
-                            </div>
+                    <article class="finance-stat finance-stat-payable">
+                        <div class="finance-stat-copy">
+                            <span>A payer aux fournisseurs</span>
+                            <strong id="financeSupplierPayable">0,0 DA</strong>
+                            <small>Solde cumule des achats</small>
                         </div>
-                        <form id="manualInvoiceForm" class="finance-form">
-                            <select class="input" id="invoiceClientId" data-finance-client-select required></select>
-                            <input class="input" id="invoiceTitle" placeholder="Objet de la facture">
-                            <div class="finance-form-row">
-                                <input class="input" id="invoiceAmount" type="number" min="0" step="0.1" placeholder="Montant" required>
-                                <input class="input" id="invoiceDueDate" type="date">
-                            </div>
-                            <button class="btn btn-primary w-full" type="submit">Creer la facture</button>
-                        </form>
+                        <span class="finance-stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h.01M15 10h.01M9 14h.01M15 14h.01M10 21v-3h4v3"/></svg>
+                        </span>
+                    </article>
+                    <article class="finance-stat finance-stat-invoices">
+                        <div class="finance-stat-copy">
+                            <span>Factures ouvertes</span>
+                            <strong id="financeUnpaidInvoices">0</strong>
+                            <small>A encaisser ou a solder</small>
+                        </div>
+                        <span class="finance-stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></svg>
+                        </span>
+                    </article>
+                    <article class="finance-stat finance-stat-orders">
+                        <div class="finance-stat-copy">
+                            <span>Bons en cours</span>
+                            <strong id="financeOpenPurchaseOrders">0</strong>
+                            <small>En attente de reception</small>
+                        </div>
+                        <span class="finance-stat-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6ZM3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+                        </span>
                     </article>
                 </section>
 
-                <section class="finance-panel">
-                    <div class="finance-section-head">
+                <section class="finance-panel finance-directory-panel">
+                    <div class="finance-directory-head">
                         <div>
-                            <p class="page-eyebrow">Factures</p>
-                            <h3>Impayees et paiements</h3>
+                            <p class="page-eyebrow">Annuaire</p>
+                            <h3>Clients et fournisseurs</h3>
+                            <p class="finance-section-description">Retrouvez un contact, consultez son solde ou ouvrez son etat detaille.</p>
                         </div>
-                        <div class="finance-toolbar">
-                            <input class="input" id="financeInvoiceSearch" placeholder="Rechercher facture/client">
-                            <select class="input" id="financeInvoiceFilter">
-                                <option value="open">Ouvertes</option>
-                                <option value="all">Toutes</option>
-                                <option value="unpaid">Non payees</option>
-                                <option value="partial">Partielles</option>
-                                <option value="paid">Payees</option>
-                                <option value="cancelled">Annulees</option>
-                            </select>
+                        <div class="finance-directory-actions">
+                            <button class="btn btn-outline" type="button" onclick="openFinanceEditor('client')">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                                Nouveau client
+                            </button>
+                            <button class="btn btn-primary" type="button" onclick="openFinanceEditor('supplier')">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                                Nouveau fournisseur
+                            </button>
                         </div>
                     </div>
-                    <div id="financeInvoicesList" class="finance-list"></div>
+
+                    <div class="finance-directory-bar">
+                        <div class="finance-directory-tabs" role="tablist" aria-label="Type de contact">
+                            <button class="finance-directory-tab active" id="financeClientsTab" type="button" role="tab" aria-selected="true" onclick="switchFinanceDirectory('clients')">
+                                Clients <span id="financeClientsCount">0</span>
+                            </button>
+                            <button class="finance-directory-tab" id="financeSuppliersTab" type="button" role="tab" aria-selected="false" onclick="switchFinanceDirectory('suppliers')">
+                                Fournisseurs <span id="financeSuppliersCount">0</span>
+                            </button>
+                        </div>
+                        <label class="finance-search-control" for="financeDirectorySearch">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <input id="financeDirectorySearch" type="search" placeholder="Rechercher un client..." autocomplete="off">
+                        </label>
+                    </div>
+
+                    <div id="financeClientsView" role="tabpanel" aria-labelledby="financeClientsTab">
+                        <div id="financeClientBalances" class="finance-directory-content"></div>
+                    </div>
+                    <div id="financeSuppliersView" role="tabpanel" aria-labelledby="financeSuppliersTab" hidden>
+                        <div id="financeSuppliersList" class="finance-directory-content"></div>
+                    </div>
                 </section>
 
-                <section class="finance-grid finance-grid-two">
-                    <article class="finance-panel">
-                        <div class="finance-section-head">
-                            <div>
-                                <p class="page-eyebrow">Fournisseurs</p>
-                                <h3>Annuaire</h3>
-                            </div>
-                        </div>
-                        <form id="supplierForm" class="finance-form">
-                            <input type="hidden" id="supplierEditId">
-                            <input class="input" id="supplierName" placeholder="Nom fournisseur" required>
-                            <div class="finance-form-row">
-                                <input class="input" id="supplierPhone" placeholder="Telephone">
-                                <input class="input" id="supplierEmail" placeholder="Email">
-                            </div>
-                            <input class="input" id="supplierAddress" placeholder="Adresse">
-                            <button class="btn btn-primary w-full" type="submit">Enregistrer fournisseur</button>
-                        </form>
-                        <div id="financeSuppliersList" class="finance-list compact"></div>
-                    </article>
-
-                    <article class="finance-panel">
-                        <div class="finance-section-head">
-                            <div>
-                                <p class="page-eyebrow">Bons de commande</p>
-                                <h3>Commande fournisseur</h3>
-                            </div>
-                        </div>
-                        <form id="purchaseOrderForm" class="finance-form">
-                            <select class="input" id="purchaseOrderSupplierId" data-finance-supplier-select required></select>
-                            <input class="input" id="purchaseOrderTitle" placeholder="Objet du bon" required>
-                            <textarea class="input" id="purchaseOrderItems" rows="4" placeholder="Une ligne par article: Nom; quantite; prix"></textarea>
-                            <div class="finance-form-row">
-                                <input class="input" id="purchaseOrderTotal" type="number" min="0" step="0.1" placeholder="Total manuel optionnel">
-                                <input class="input" id="purchaseOrderExpectedDate" type="date">
-                            </div>
-                            <button class="btn btn-primary w-full" type="submit">Creer le bon</button>
-                        </form>
-                    </article>
-                </section>
-
-                <section class="finance-panel">
-                    <div class="finance-section-head">
+                <section class="finance-panel finance-records-panel">
+                    <div class="finance-section-head finance-records-head">
                         <div>
-                            <p class="page-eyebrow">Suivi fournisseurs</p>
+                            <p class="page-eyebrow">Facturation clients</p>
+                            <h3>Factures et paiements</h3>
+                        </div>
+                        <button class="btn btn-primary" type="button" onclick="openFinanceEditor('invoice')">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                            Nouvelle facture
+                        </button>
+                    </div>
+                    <div class="finance-toolbar finance-records-toolbar">
+                        <label class="finance-search-control" for="financeInvoiceSearch">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <input id="financeInvoiceSearch" type="search" placeholder="Numero, client ou objet..." autocomplete="off">
+                        </label>
+                        <select class="input finance-status-filter" id="financeInvoiceFilter" aria-label="Filtrer les factures">
+                            <option value="open">Factures ouvertes</option>
+                            <option value="all">Toutes les factures</option>
+                            <option value="unpaid">Non payees</option>
+                            <option value="partial">Partiellement payees</option>
+                            <option value="paid">Payees</option>
+                            <option value="cancelled">Annulees</option>
+                        </select>
+                    </div>
+                    <div id="financeInvoicesList" class="finance-records-list"></div>
+                </section>
+
+                <section class="finance-panel finance-records-panel">
+                    <div class="finance-section-head finance-records-head">
+                        <div>
+                            <p class="page-eyebrow">Achats fournisseurs</p>
                             <h3>Bons de commande</h3>
                         </div>
+                        <button class="btn btn-outline" type="button" onclick="openFinanceEditor('purchaseOrder')">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                            Nouveau bon
+                        </button>
                     </div>
-                    <div id="financePurchaseOrdersList" class="finance-list"></div>
+                    <div id="financePurchaseOrdersList" class="finance-records-list"></div>
                 </section>
             </main>
+        </div>
+    </div>
+
+    <div id="financeClientModal" class="modal-overlay finance-editor-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="financeClientModalTitle">
+        <div class="modal-content finance-editor-modal">
+            <div class="modal-header">
+                <div>
+                    <p class="page-eyebrow">Annuaire client</p>
+                    <h3 id="financeClientModalTitle">Nouveau client</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeFinanceModal('financeClientModal')" aria-label="Fermer">&times;</button>
+            </div>
+            <form id="financeClientForm" class="finance-form finance-editor-form">
+                <input type="hidden" id="financeClientEditId">
+                <div class="finance-field finance-field-wide">
+                    <label for="financeClientName">Nom ou entreprise</label>
+                    <input class="input" id="financeClientName" placeholder="Ex: Cafe Gourmand" required>
+                </div>
+                <div class="finance-form-row">
+                    <div class="finance-field">
+                        <label for="financeClientPhone">Telephone</label>
+                        <input class="input" id="financeClientPhone" placeholder="Ex: 0550 12 34 56">
+                    </div>
+                    <div class="finance-field">
+                        <label for="financeClientEmail">Email</label>
+                        <input class="input" id="financeClientEmail" type="email" placeholder="contact@exemple.dz">
+                    </div>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="financeClientAddress">Adresse</label>
+                    <input class="input" id="financeClientAddress" placeholder="Ville, quartier ou adresse">
+                </div>
+                <div class="finance-editor-footer">
+                    <button class="btn btn-outline" type="button" onclick="closeFinanceModal('financeClientModal')">Annuler</button>
+                    <button class="btn btn-primary" type="submit">Enregistrer le client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="financeSupplierModal" class="modal-overlay finance-editor-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="financeSupplierModalTitle">
+        <div class="modal-content finance-editor-modal">
+            <div class="modal-header">
+                <div>
+                    <p class="page-eyebrow">Annuaire fournisseur</p>
+                    <h3 id="financeSupplierModalTitle">Nouveau fournisseur</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeFinanceModal('financeSupplierModal')" aria-label="Fermer">&times;</button>
+            </div>
+            <form id="supplierForm" class="finance-form finance-editor-form">
+                <input type="hidden" id="supplierEditId">
+                <div class="finance-field finance-field-wide">
+                    <label for="supplierName">Nom du fournisseur</label>
+                    <input class="input" id="supplierName" placeholder="Ex: Emballages Gouraya" required>
+                </div>
+                <div class="finance-form-row">
+                    <div class="finance-field">
+                        <label for="supplierPhone">Telephone</label>
+                        <input class="input" id="supplierPhone" placeholder="Ex: 0550 12 34 56">
+                    </div>
+                    <div class="finance-field">
+                        <label for="supplierEmail">Email</label>
+                        <input class="input" id="supplierEmail" type="email" placeholder="contact@exemple.dz">
+                    </div>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="supplierAddress">Adresse</label>
+                    <input class="input" id="supplierAddress" placeholder="Ville, zone ou adresse">
+                </div>
+                <div class="finance-editor-footer">
+                    <button class="btn btn-outline" type="button" onclick="closeFinanceModal('financeSupplierModal')">Annuler</button>
+                    <button class="btn btn-primary" type="submit">Enregistrer le fournisseur</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="financeInvoiceModal" class="modal-overlay finance-editor-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="financeInvoiceModalTitle">
+        <div class="modal-content finance-editor-modal">
+            <div class="modal-header">
+                <div>
+                    <p class="page-eyebrow">Facturation</p>
+                    <h3 id="financeInvoiceModalTitle">Nouvelle facture client</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeFinanceModal('financeInvoiceModal')" aria-label="Fermer">&times;</button>
+            </div>
+            <form id="manualInvoiceForm" class="finance-form finance-editor-form">
+                <div class="finance-field finance-field-wide">
+                    <label for="invoiceClientId">Client</label>
+                    <select class="input" id="invoiceClientId" data-finance-client-select required></select>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="invoiceTitle">Objet de la facture</label>
+                    <input class="input" id="invoiceTitle" placeholder="Ex: Commande evenementielle">
+                </div>
+                <div class="finance-form-row">
+                    <div class="finance-field">
+                        <label for="invoiceAmount">Montant</label>
+                        <input class="input" id="invoiceAmount" type="number" min="0" step="0.1" placeholder="0,0 DA" required>
+                    </div>
+                    <div class="finance-field">
+                        <label for="invoiceDueDate">Echeance</label>
+                        <input class="input" id="invoiceDueDate" type="date">
+                    </div>
+                </div>
+                <div class="finance-editor-footer">
+                    <button class="btn btn-outline" type="button" onclick="closeFinanceModal('financeInvoiceModal')">Annuler</button>
+                    <button class="btn btn-primary" type="submit">Creer la facture</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="financePurchaseOrderModal" class="modal-overlay finance-editor-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="financePurchaseOrderModalTitle">
+        <div class="modal-content finance-editor-modal finance-editor-modal-wide">
+            <div class="modal-header">
+                <div>
+                    <p class="page-eyebrow">Achats fournisseurs</p>
+                    <h3 id="financePurchaseOrderModalTitle">Nouveau bon de commande</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeFinanceModal('financePurchaseOrderModal')" aria-label="Fermer">&times;</button>
+            </div>
+            <form id="purchaseOrderForm" class="finance-form finance-editor-form">
+                <div class="finance-form-row">
+                    <div class="finance-field">
+                        <label for="purchaseOrderSupplierId">Fournisseur</label>
+                        <select class="input" id="purchaseOrderSupplierId" data-finance-supplier-select required></select>
+                    </div>
+                    <div class="finance-field">
+                        <label for="purchaseOrderExpectedDate">Date attendue</label>
+                        <input class="input" id="purchaseOrderExpectedDate" type="date">
+                    </div>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="purchaseOrderTitle">Objet du bon</label>
+                    <input class="input" id="purchaseOrderTitle" placeholder="Ex: Reassort mensuel" required>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="purchaseOrderItems">Articles</label>
+                    <textarea class="input" id="purchaseOrderItems" rows="5" placeholder="Une ligne par article: Nom; quantite; prix"></textarea>
+                    <small>Exemple: Chocolat noir; 10; 850</small>
+                </div>
+                <div class="finance-field finance-field-wide">
+                    <label for="purchaseOrderTotal">Total manuel optionnel</label>
+                    <input class="input" id="purchaseOrderTotal" type="number" min="0" step="0.1" placeholder="Laissez vide pour calculer les lignes">
+                </div>
+                <div class="finance-editor-footer">
+                    <button class="btn btn-outline" type="button" onclick="closeFinanceModal('financePurchaseOrderModal')">Annuler</button>
+                    <button class="btn btn-primary" type="submit">Creer le bon</button>
+                </div>
+            </form>
         </div>
     </div>
 

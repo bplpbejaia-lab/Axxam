@@ -1374,15 +1374,22 @@
                 <div class="add-lot-card">
                     <h3>🧾 Facture d'achat groupée</h3>
                     <div class="lot-form-grid">
-                        <div class="form-group">
+                        <div class="form-group purchase-supplier-field">
                             <label>Fournisseur</label>
                             <div class="inline-field-actions">
-                                <select class="input" id="purchaseSupplierSelect" data-supplier-select></select>
-                                <button type="button" class="mini-action-btn" onclick="addSupplierFromAchats('purchaseSupplierSelect')" title="Ajouter fournisseur">+</button>
-                                <button type="button" class="mini-action-btn" onclick="editSelectedSupplier('purchaseSupplierSelect')" title="Modifier fournisseur">✎</button>
+                                <div class="supplier-select-control">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h.01M15 10h.01M9 14h.01M15 14h.01M10 21v-3h4v3"/></svg>
+                                    <select class="input" id="purchaseSupplierSelect" data-supplier-select aria-label="Choisir un fournisseur"></select>
+                                </div>
+                                <button type="button" class="mini-action-btn" onclick="addSupplierFromAchats('purchaseSupplierSelect')" title="Ajouter un fournisseur" aria-label="Ajouter un fournisseur">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                                </button>
+                                <button type="button" class="mini-action-btn" onclick="editSelectedSupplier('purchaseSupplierSelect')" title="Modifier le fournisseur selectionne" aria-label="Modifier le fournisseur selectionne">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                </button>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group purchase-date-field">
                             <label>Date facture</label>
                             <input type="date" class="input" id="purchaseInvoiceDate">
                         </div>
@@ -1641,7 +1648,7 @@
         function renderSupplierSelects(selectedId = '') {
             if (!db.suppliers) db.suppliers = [];
             const suppliers = [...db.suppliers].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
-            const options = '<option value="">Sans fournisseur</option>' + suppliers.map(supplier =>
+            const options = '<option value="">Choisir un fournisseur...</option>' + suppliers.map(supplier =>
                 `<option value="${supplier.id}">${escapeHtml(supplier.name || 'Fournisseur')}</option>`
             ).join('');
 

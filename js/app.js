@@ -330,6 +330,9 @@ function initClientSelector() {
     selector.innerHTML = db.clients.map(c =>
         `<option value="${c.id}" ${c.id === selectedClientId ? 'selected' : ''}>👤 ${c.name}</option>`
     ).join('');
+    selector.innerHTML = db.clients.map(client =>
+        `<option value="${escapeHtml(client.id)}" ${client.id === selectedClientId ? 'selected' : ''}>${escapeHtml(client.name || 'Client')}</option>`
+    ).join('');
 }
 
 function handleClientChange() {
@@ -904,13 +907,209 @@ const PURCHASE_ORDER_STATUS_LABELS = {
 };
 
 function ensureFinanceDefaults() {
-    if (!db.clients) db.clients = [{ id: 'divers', name: 'Vente', phone: '-', email: '-' }];
+    if (!Array.isArray(db.clients)) db.clients = [];
+    if (!db.clients.some(client => client.id === 'divers')) {
+        db.clients.unshift({ id: 'divers', name: 'Vente', phone: '-', email: '-' });
+    }
     if (!db.invoices) db.invoices = [];
     if (!db.suppliers) db.suppliers = [];
     if (!db.purchaseOrders) db.purchaseOrders = [];
     if (!db.purchaseInvoices) db.purchaseInvoices = [];
     if (!db.saleReturns) db.saleReturns = [];
     if (!db.purchaseReturns) db.purchaseReturns = [];
+}
+
+let financeDirectoryMode = 'clients';
+
+const FINANCE_DEMO_CLIENTS = [
+    {
+        id: 'demo-client-cafe-gourmand',
+        name: 'Cafe Gourmand',
+        phone: '0550 24 18 90',
+        email: 'contact@cafegourmand.dz',
+        address: 'Centre-ville, Bejaia',
+        isDemo: true
+    },
+    {
+        id: 'demo-client-boulangerie-bahia',
+        name: 'Boulangerie El Bahia',
+        phone: '0770 42 31 08',
+        email: 'commandes@elbahia.dz',
+        address: 'Sidi Ahmed, Bejaia',
+        isDemo: true
+    },
+    {
+        id: 'demo-client-hotel-atlas',
+        name: 'Hotel Atlas',
+        phone: '0560 11 64 22',
+        email: 'achats@hotelatlas.dz',
+        address: 'Route des Aures, Bejaia',
+        isDemo: true
+    }
+];
+
+const FINANCE_DEMO_SUPPLIERS = [
+    {
+        id: 'demo-supplier-gouraya',
+        name: 'Emballages Gouraya',
+        phone: '0551 80 22 14',
+        email: 'ventes@gouraya-emballage.dz',
+        address: 'Zone industrielle, Bejaia',
+        isDemo: true
+    },
+    {
+        id: 'demo-supplier-maison-lait',
+        name: 'Maison du Lait Bejaia',
+        phone: '0771 36 09 52',
+        email: 'contact@maisondulait.dz',
+        address: 'Oued Ghir, Bejaia',
+        isDemo: true
+    },
+    {
+        id: 'demo-supplier-saveurs',
+        name: 'Saveurs du Djurdjura',
+        phone: '0561 43 77 20',
+        email: 'pro@saveurs-djurdjura.dz',
+        address: 'Akbou, Bejaia',
+        isDemo: true
+    }
+];
+
+function addFinanceDemoData(kind = 'all') {
+    ensureFinanceDefaults();
+    let added = 0;
+
+    if (kind === 'all' || kind === 'clients') {
+        FINANCE_DEMO_CLIENTS.forEach(sample => {
+            if ((db.clients || []).some(client => String(client.id) === sample.id)) return;
+            db.clients.push({ ...sample, createdAt: new Date().toISOString() });
+            added += 1;
+        });
+    }
+
+    if (kind === 'all' || kind === 'suppliers') {
+        FINANCE_DEMO_SUPPLIERS.forEach(sample => {
+            if ((db.suppliers || []).some(supplier => String(supplier.id) === sample.id)) return;
+            db.suppliers.push({ ...sample, createdAt: new Date().toISOString() });
+            added += 1;
+        });
+    }
+
+    if (!added) {
+        showToast('Les donnees exemple sont deja presentes', 'info');
+        return;
+    }
+
+    saveDataImmediate();
+    renderFinancePage();
+    showToast(`${added} fiche${added > 1 ? 's' : ''} exemple ajoutee${added > 1 ? 's' : ''}`, 'success');
+}
+
+function getFinanceInitials(name) {
+    return String(name || '?')
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0).toUpperCase())
+        .join('') || '?';
+}
+
+function getClientFinanceSummary(clientId) {
+    const invoices = (db.invoices || [])
+        .filter(invoice => String(invoice.clientId) === String(clientId) && invoice.status !== 'cancelled')
+        .map(refreshInvoiceStatus);
+    const total = invoices.reduce((sum, invoice) => sum + (parseFloat(invoice.amount) || 0), 0);
+    const paid = invoices.reduce((sum, invoice) => sum + getInvoicePaidAmount(invoice), 0);
+    const balance = invoices.reduce((sum, invoice) => sum + getInvoiceRemaining(invoice), 0);
+
+    return {
+        invoices,
+        total,
+        paid,
+        balance,
+        openCount: invoices.filter(invoice => getInvoiceRemaining(invoice) > 0).length
+    };
+}
+
+function openFinanceModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => modal.classList.add('is-open'));
+    setTimeout(() => modal.querySelector('input:not([type="hidden"]), select, textarea')?.focus(), 80);
+}
+
+function closeFinanceModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.style.display = 'none';
+}
+
+function openFinanceEditor(type) {
+    if (type === 'client') {
+        document.getElementById('financeClientForm')?.reset();
+        const editInput = document.getElementById('financeClientEditId');
+        if (editInput) editInput.value = '';
+        const title = document.getElementById('financeClientModalTitle');
+        if (title) title.textContent = 'Nouveau client';
+        openFinanceModal('financeClientModal');
+        return;
+    }
+
+    if (type === 'supplier') {
+        document.getElementById('supplierForm')?.reset();
+        const editInput = document.getElementById('supplierEditId');
+        if (editInput) editInput.value = '';
+        const title = document.getElementById('financeSupplierModalTitle');
+        if (title) title.textContent = 'Nouveau fournisseur';
+        openFinanceModal('financeSupplierModal');
+        return;
+    }
+
+    if (type === 'invoice') {
+        document.getElementById('manualInvoiceForm')?.reset();
+        updateFinanceSelects();
+        openFinanceModal('financeInvoiceModal');
+        return;
+    }
+
+    if (type === 'purchaseOrder') {
+        document.getElementById('purchaseOrderForm')?.reset();
+        updateFinanceSelects();
+        openFinanceModal('financePurchaseOrderModal');
+    }
+}
+
+function switchFinanceDirectory(mode) {
+    financeDirectoryMode = mode === 'suppliers' ? 'suppliers' : 'clients';
+    const clientsView = document.getElementById('financeClientsView');
+    const suppliersView = document.getElementById('financeSuppliersView');
+    const clientsTab = document.getElementById('financeClientsTab');
+    const suppliersTab = document.getElementById('financeSuppliersTab');
+    const searchInput = document.getElementById('financeDirectorySearch');
+
+    if (clientsView) clientsView.hidden = financeDirectoryMode !== 'clients';
+    if (suppliersView) suppliersView.hidden = financeDirectoryMode !== 'suppliers';
+    clientsTab?.classList.toggle('active', financeDirectoryMode === 'clients');
+    suppliersTab?.classList.toggle('active', financeDirectoryMode === 'suppliers');
+    clientsTab?.setAttribute('aria-selected', financeDirectoryMode === 'clients' ? 'true' : 'false');
+    suppliersTab?.setAttribute('aria-selected', financeDirectoryMode === 'suppliers' ? 'true' : 'false');
+
+    if (searchInput) {
+        searchInput.value = '';
+        searchInput.placeholder = financeDirectoryMode === 'clients'
+            ? 'Rechercher un client...'
+            : 'Rechercher un fournisseur...';
+        searchInput.focus();
+    }
+
+    renderFinanceDirectory();
+}
+
+function renderFinanceDirectory() {
+    renderClientBalances();
+    renderSuppliers();
 }
 
 function generateFinanceNumber(prefix, collection, field = 'number') {
@@ -1093,37 +1292,90 @@ function renderFinanceStats() {
 function renderClientBalances() {
     const container = document.getElementById('financeClientBalances');
     if (!container) return;
-    const rows = (db.clients || [])
+    const allClients = (db.clients || [])
         .filter(client => client.id !== 'divers')
-        .map(client => ({ client, balance: getClientBalance(client.id) }))
-        .filter(item => item.balance > 0)
-        .sort((a, b) => b.balance - a.balance);
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    const count = document.getElementById('financeClientsCount');
+    if (count) count.textContent = allClients.length;
 
-    if (!rows.length) {
-        container.innerHTML = '<div class="finance-empty">Aucun solde client impaye.</div>';
+    const search = (document.getElementById('financeDirectorySearch')?.value || '').trim().toLowerCase();
+    const clients = search
+        ? allClients.filter(client => `${client.name || ''} ${client.phone || ''} ${client.email || ''} ${client.address || ''}`.toLowerCase().includes(search))
+        : allClients;
+
+    if (!allClients.length) {
+        container.innerHTML = `
+            <div class="finance-empty finance-empty-action">
+                <strong>Aucun client enregistre</strong>
+                <span>Ajoutez votre premier client ou chargez quelques fiches de demonstration.</span>
+                <div>
+                    <button class="btn btn-primary" type="button" onclick="openFinanceEditor('client')">Nouveau client</button>
+                    <button class="btn btn-outline" type="button" onclick="addFinanceDemoData('clients')">Ajouter des exemples</button>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if (!clients.length) {
+        container.innerHTML = '<div class="finance-empty">Aucun client ne correspond a cette recherche.</div>';
         return;
     }
 
     container.innerHTML = `
-        <div class="finance-table-wrap">
+        <div class="finance-table-wrap finance-directory-table-wrap">
             <table class="finance-public-table">
                 <thead>
                     <tr>
                         <th>Client</th>
-                        <th>Telephone</th>
+                        <th>Contact</th>
+                        <th>Factures</th>
+                        <th>Total facture</th>
+                        <th>Paye</th>
                         <th>Solde</th>
-                        <th>Actions</th>
+                        <th>Statut</th>
+                        <th class="finance-actions-column">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${rows.map(({ client, balance }) => `
+                    ${clients.map(client => {
+        const summary = getClientFinanceSummary(client.id);
+        const hasBalance = summary.balance > 0.001;
+        return `
                         <tr>
-                            <td><strong>${escapeHtml(client.name)}</strong></td>
-                            <td>${escapeHtml(client.phone || '-')}</td>
-                            <td><span class="finance-table-amount">${formatPrice(balance)}</span></td>
-                            <td><button class="btn btn-sm btn-outline" onclick="showClientStatement('${escapeHtml(client.id)}')">Etat</button></td>
+                            <td>
+                                <div class="finance-contact-cell">
+                                    <span class="finance-contact-avatar client">${escapeHtml(getFinanceInitials(client.name))}</span>
+                                    <div>
+                                        <strong>${escapeHtml(client.name || 'Client')}</strong>
+                                        <span>${escapeHtml(client.address || 'Adresse non renseignee')}</span>
+                                        ${client.isDemo ? '<em class="finance-demo-chip">Exemple</em>' : ''}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong class="finance-contact-phone">${escapeHtml(client.phone || '-')}</strong>
+                                <span>${escapeHtml(client.email || 'Email non renseigne')}</span>
+                            </td>
+                            <td><strong>${summary.invoices.length}</strong><span>${summary.openCount} ouverte${summary.openCount > 1 ? 's' : ''}</span></td>
+                            <td>${formatPrice(summary.total)}</td>
+                            <td>${formatPrice(summary.paid)}</td>
+                            <td><span class="finance-table-amount ${hasBalance ? 'danger' : 'ok'}">${hasBalance ? formatPrice(summary.balance) : 'Solde OK'}</span></td>
+                            <td><span class="finance-row-status ${hasBalance ? 'is-due' : 'is-ok'}">${hasBalance ? 'A regler' : 'A jour'}</span></td>
+                            <td class="finance-actions-cell">
+                                <div class="finance-table-actions">
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="showClientStatement('${escapeHtml(client.id)}')">Voir l'etat</button>
+                                    <button class="finance-icon-button" type="button" onclick="editFinanceClient('${escapeHtml(client.id)}')" title="Modifier le client" aria-label="Modifier le client">
+                                        <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                    </button>
+                                    <button class="finance-icon-button danger" type="button" onclick="deleteFinanceClient('${escapeHtml(client.id)}')" title="Supprimer le client" aria-label="Supprimer le client">
+                                        <svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v5M14 11v5"/></svg>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                    `).join('')}
+                    `;
+    }).join('')}
                 </tbody>
             </table>
         </div>
@@ -1154,33 +1406,63 @@ function renderInvoices() {
         return;
     }
 
-    container.innerHTML = invoices.map(invoice => {
+    container.innerHTML = `
+        <div class="finance-table-wrap">
+            <table class="finance-public-table finance-records-table">
+                <thead>
+                    <tr>
+                        <th>Facture</th>
+                        <th>Client</th>
+                        <th>Total</th>
+                        <th>Paye</th>
+                        <th>Reste</th>
+                        <th>Statut</th>
+                        <th class="finance-actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${invoices.map(invoice => {
         const remaining = getInvoiceRemaining(invoice);
         const paid = getInvoicePaidAmount(invoice);
+        const canPay = remaining > 0 && invoice.status !== 'cancelled';
         return `
-            <article class="finance-card finance-invoice-card status-${invoice.status}">
-                <div class="finance-card-head">
-                    <div>
-                        <span class="finance-code">${escapeHtml(invoice.number)}</span>
-                        <h3>${escapeHtml(invoice.clientName || getClientById(invoice.clientId).name)}</h3>
-                        <p>${escapeHtml(invoice.title || 'Facture')} ${invoice.dueDate ? '- Ech. ' + escapeHtml(invoice.dueDate) : ''}</p>
-                    </div>
-                    <span class="finance-status">${INVOICE_STATUS_LABELS[invoice.status] || invoice.status}</span>
-                </div>
-                <div class="finance-amount-grid">
-                    <div><span>Total</span><strong>${formatPrice(invoice.amount)}</strong></div>
-                    <div><span>Paye</span><strong>${formatPrice(paid)}</strong></div>
-                    <div><span>Reste</span><strong>${formatPrice(remaining)}</strong></div>
-                </div>
-                <div class="finance-actions">
-                    <button class="btn btn-sm btn-primary" onclick="recordInvoicePayment('${invoice.id}')" ${remaining <= 0 || invoice.status === 'cancelled' ? 'disabled' : ''}>Encaisser</button>
-                    <button class="btn btn-sm btn-outline" onclick="payInvoiceInFull('${invoice.id}')" ${remaining <= 0 || invoice.status === 'cancelled' ? 'disabled' : ''}>Solder</button>
-                    <button class="btn btn-sm btn-outline" onclick="printInvoice('${invoice.id}')">Imprimer</button>
-                    <button class="btn btn-sm btn-danger" onclick="cancelInvoice('${invoice.id}')" ${invoice.status === 'cancelled' ? 'disabled' : ''}>Annuler</button>
-                </div>
-            </article>
-        `;
-    }).join('');
+                            <tr>
+                                <td>
+                                    <strong class="finance-code">${escapeHtml(invoice.number || 'Facture')}</strong>
+                                    <span>${escapeHtml(invoice.title || 'Facture client')}</span>
+                                </td>
+                                <td>
+                                    <strong>${escapeHtml(invoice.clientName || getClientById(invoice.clientId).name)}</strong>
+                                    <span>${invoice.dueDate ? 'Echeance ' + escapeHtml(invoice.dueDate) : 'Sans echeance'}</span>
+                                </td>
+                                <td><strong>${formatPrice(invoice.amount)}</strong></td>
+                                <td>${formatPrice(paid)}</td>
+                                <td><span class="finance-table-amount ${remaining > 0 ? 'danger' : 'ok'}">${remaining > 0 ? formatPrice(remaining) : 'Soldee'}</span></td>
+                                <td><span class="finance-row-status status-${invoice.status}">${INVOICE_STATUS_LABELS[invoice.status] || invoice.status}</span></td>
+                                <td class="finance-actions-cell">
+                                    <div class="finance-table-actions">
+                                        <button class="btn btn-sm btn-primary" type="button" onclick="recordInvoicePayment('${invoice.id}')" ${canPay ? '' : 'disabled'}>Encaisser</button>
+                                        <button class="finance-icon-button" type="button" onclick="printInvoice('${invoice.id}')" title="Imprimer la facture" aria-label="Imprimer la facture">
+                                            <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+                                        </button>
+                                        <details class="finance-action-menu">
+                                            <summary title="Plus d'actions" aria-label="Plus d'actions">
+                                                <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                                            </summary>
+                                            <div class="finance-action-popover">
+                                                <button type="button" onclick="payInvoiceInFull('${invoice.id}')" ${canPay ? '' : 'disabled'}>Solder la facture</button>
+                                                <button class="danger" type="button" onclick="cancelInvoice('${invoice.id}')" ${invoice.status === 'cancelled' ? 'disabled' : ''}>Annuler la facture</button>
+                                            </div>
+                                        </details>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function createManualInvoice(event) {
@@ -1207,6 +1489,7 @@ function createManualInvoice(event) {
     }
 
     event.target.reset();
+    closeFinanceModal('financeInvoiceModal');
     saveDataImmediate();
     renderFinancePage();
     showToast('Facture creee', 'success');
@@ -1295,18 +1578,23 @@ function openFinanceStatementModal(title, summaryHtml, rowsHtml) {
 
 function showClientStatement(clientId) {
     const client = getClientById(clientId);
-    const invoices = getClientOpenInvoices(clientId);
+    const invoices = (db.invoices || [])
+        .filter(invoice => String(invoice.clientId) === String(clientId) && invoice.status !== 'cancelled')
+        .map(refreshInvoiceStatus)
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     const balance = getClientBalance(clientId);
     const paidTotal = invoices.reduce((sum, invoice) => sum + getInvoicePaidAmount(invoice), 0);
     const amountTotal = invoices.reduce((sum, invoice) => sum + (parseFloat(invoice.amount) || 0), 0);
     const summary = `
         <div class="finance-statement-summary">
-            <div><span>Total ouvert</span><strong>${formatPrice(amountTotal)}</strong></div>
+            <div><span>Total facture</span><strong>${formatPrice(amountTotal)}</strong></div>
             <div><span>Paye</span><strong>${formatPrice(paidTotal)}</strong></div>
             <div><span>Solde</span><strong>${formatPrice(balance)}</strong></div>
         </div>
     `;
-    const rows = invoices.length ? invoices.map(invoice => `
+    const rows = invoices.length ? invoices.map(invoice => {
+        const remaining = getInvoiceRemaining(invoice);
+        return `
         <article class="finance-card status-${invoice.status}">
             <div class="finance-card-head">
                 <div>
@@ -1319,15 +1607,16 @@ function showClientStatement(clientId) {
             <div class="finance-amount-grid">
                 <div><span>Total</span><strong>${formatPrice(invoice.amount)}</strong></div>
                 <div><span>Paye</span><strong>${formatPrice(getInvoicePaidAmount(invoice))}</strong></div>
-                <div><span>Reste</span><strong>${formatPrice(getInvoiceRemaining(invoice))}</strong></div>
+                <div><span>Reste</span><strong>${formatPrice(remaining)}</strong></div>
             </div>
             <div class="finance-actions">
-                <button class="btn btn-sm btn-primary" onclick="recordInvoicePayment('${invoice.id}'); this.closest('.modal-overlay')?.remove();">Encaisser</button>
-                <button class="btn btn-sm btn-outline" onclick="payInvoiceInFull('${invoice.id}'); this.closest('.modal-overlay')?.remove();">Solder</button>
+                <button class="btn btn-sm btn-primary" onclick="recordInvoicePayment('${invoice.id}'); this.closest('.modal-overlay')?.remove();" ${remaining <= 0 ? 'disabled' : ''}>Encaisser</button>
+                <button class="btn btn-sm btn-outline" onclick="payInvoiceInFull('${invoice.id}'); this.closest('.modal-overlay')?.remove();" ${remaining <= 0 ? 'disabled' : ''}>Solder</button>
                 <button class="btn btn-sm btn-outline" onclick="printInvoice('${invoice.id}')">Imprimer</button>
             </div>
         </article>
-    `).join('') : '<div class="finance-empty">Aucune facture client ouverte.</div>';
+    `;
+    }).join('') : '<div class="finance-empty">Aucune facture pour ce client.</div>';
 
     openFinanceStatementModal(`Etat client - ${client.name || 'Client'}`, summary, rows);
 }
@@ -1457,45 +1746,83 @@ function showSupplierStatement(supplierId) {
 function renderSuppliers() {
     const container = document.getElementById('financeSuppliersList');
     if (!container) return;
-    const suppliers = [...(db.suppliers || [])].sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    const allSuppliers = [...(db.suppliers || [])].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    const count = document.getElementById('financeSuppliersCount');
+    if (count) count.textContent = allSuppliers.length;
+    const search = (document.getElementById('financeDirectorySearch')?.value || '').trim().toLowerCase();
+    const suppliers = search
+        ? allSuppliers.filter(supplier => `${supplier.name || ''} ${supplier.phone || ''} ${supplier.email || ''} ${supplier.address || ''}`.toLowerCase().includes(search))
+        : allSuppliers;
+
+    if (!allSuppliers.length) {
+        container.innerHTML = `
+            <div class="finance-empty finance-empty-action">
+                <strong>Aucun fournisseur enregistre</strong>
+                <span>Ajoutez un fournisseur ou chargez quelques fiches de demonstration.</span>
+                <div>
+                    <button class="btn btn-primary" type="button" onclick="openFinanceEditor('supplier')">Nouveau fournisseur</button>
+                    <button class="btn btn-outline" type="button" onclick="addFinanceDemoData('suppliers')">Ajouter des exemples</button>
+                </div>
+            </div>
+        `;
+        return;
+    }
 
     if (!suppliers.length) {
-        container.innerHTML = '<div class="finance-empty">Aucun fournisseur pour le moment.</div>';
+        container.innerHTML = '<div class="finance-empty">Aucun fournisseur ne correspond a cette recherche.</div>';
         return;
     }
 
     container.innerHTML = `
-        <div class="finance-table-wrap">
+        <div class="finance-table-wrap finance-directory-table-wrap">
             <table class="finance-public-table">
                 <thead>
                     <tr>
                         <th>Fournisseur</th>
                         <th>Contact</th>
+                        <th>Factures</th>
                         <th>Total achats</th>
                         <th>Retours</th>
                         <th>Reste</th>
-                        <th>Actions</th>
+                        <th>Statut</th>
+                        <th class="finance-actions-column">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     ${suppliers.map(supplier => {
         const summary = getSupplierFinanceSummary(supplier.id);
+        const hasBalance = summary.balance > 0.001;
         return `
                             <tr>
                                 <td>
-                                    <strong>${escapeHtml(supplier.name)}</strong>
-                                    ${supplier.address ? `<span>${escapeHtml(supplier.address)}</span>` : ''}
+                                    <div class="finance-contact-cell">
+                                        <span class="finance-contact-avatar supplier">${escapeHtml(getFinanceInitials(supplier.name))}</span>
+                                        <div>
+                                            <strong>${escapeHtml(supplier.name || 'Fournisseur')}</strong>
+                                            <span>${escapeHtml(supplier.address || 'Adresse non renseignee')}</span>
+                                            ${supplier.isDemo ? '<em class="finance-demo-chip">Exemple</em>' : ''}
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>${escapeHtml(supplier.phone || '-')} ${supplier.email ? `<span>${escapeHtml(supplier.email)}</span>` : ''}</td>
+                                <td><strong class="finance-contact-phone">${escapeHtml(supplier.phone || '-')}</strong><span>${escapeHtml(supplier.email || 'Email non renseigne')}</span></td>
+                                <td><strong>${summary.invoices.length}</strong><span>facture${summary.invoices.length > 1 ? 's' : ''} d'achat</span></td>
                                 <td>${formatPrice(summary.total)}</td>
                                 <td>${formatPrice(summary.returns)}</td>
-                                <td><span class="finance-table-amount ${summary.balance > 0 ? 'danger' : 'ok'}">${summary.balance > 0 ? formatPrice(summary.balance) : 'Solde OK'}</span></td>
-                                <td>
+                                <td><span class="finance-table-amount ${hasBalance ? 'danger' : 'ok'}">${hasBalance ? formatPrice(summary.balance) : 'Solde OK'}</span></td>
+                                <td><span class="finance-row-status ${hasBalance ? 'is-due' : 'is-ok'}">${hasBalance ? 'A payer' : 'A jour'}</span></td>
+                                <td class="finance-actions-cell">
                                     <div class="finance-table-actions">
-                                        <button class="btn btn-sm btn-primary" onclick="showSupplierStatement('${supplier.id}')">Etat</button>
-                                        <button class="btn btn-sm btn-outline" onclick="paySupplierOldestInvoice('${supplier.id}')" ${summary.balance <= 0 ? 'disabled' : ''}>Payer</button>
-                                        <button class="btn btn-sm btn-outline" onclick="editSupplier('${supplier.id}')">Modifier</button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteSupplier('${supplier.id}')">Supprimer</button>
+                                        <button class="btn btn-sm btn-primary" type="button" onclick="showSupplierStatement('${supplier.id}')">Voir l'etat</button>
+                                        <button class="btn btn-sm btn-outline" type="button" onclick="paySupplierOldestInvoice('${supplier.id}')" ${hasBalance ? '' : 'disabled'}>Payer</button>
+                                        <details class="finance-action-menu">
+                                            <summary title="Plus d'actions" aria-label="Plus d'actions">
+                                                <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                                            </summary>
+                                            <div class="finance-action-popover">
+                                                <button type="button" onclick="editSupplier('${supplier.id}')">Modifier</button>
+                                                <button class="danger" type="button" onclick="deleteSupplier('${supplier.id}')">Supprimer</button>
+                                            </div>
+                                        </details>
                                     </div>
                                 </td>
                             </tr>
@@ -1505,6 +1832,89 @@ function renderSuppliers() {
             </table>
         </div>
     `;
+}
+
+function saveFinanceClient(event) {
+    event.preventDefault();
+    ensureFinanceDefaults();
+    const id = document.getElementById('financeClientEditId')?.value || '';
+    const name = (document.getElementById('financeClientName')?.value || '').trim();
+    const phone = (document.getElementById('financeClientPhone')?.value || '').trim();
+    const email = (document.getElementById('financeClientEmail')?.value || '').trim();
+    const address = (document.getElementById('financeClientAddress')?.value || '').trim();
+
+    if (!name) {
+        showToast('Nom du client obligatoire', 'warning');
+        return;
+    }
+
+    const duplicate = (db.clients || []).find(client =>
+        String(client.id) !== String(id)
+        && phone
+        && phone !== '-'
+        && normalizeCustomerPhone(client.phone) === normalizeCustomerPhone(phone)
+    );
+    if (duplicate) {
+        showToast(`Ce telephone est deja utilise par ${duplicate.name}`, 'warning');
+        return;
+    }
+
+    const data = {
+        name,
+        phone: phone || '-',
+        email: email || '-',
+        address,
+        updatedAt: new Date().toISOString()
+    };
+
+    if (id) {
+        const client = db.clients.find(item => String(item.id) === String(id));
+        if (client) Object.assign(client, data, { isDemo: false });
+    } else {
+        db.clients.push({
+            id: `client-${Date.now()}`,
+            ...data,
+            createdAt: new Date().toISOString()
+        });
+    }
+
+    event.target.reset();
+    closeFinanceModal('financeClientModal');
+    saveDataImmediate();
+    renderFinancePage();
+    showToast(id ? 'Client mis a jour' : 'Client ajoute', 'success');
+}
+
+function editFinanceClient(clientId) {
+    const client = (db.clients || []).find(item => String(item.id) === String(clientId));
+    if (!client || client.id === 'divers') return;
+    document.getElementById('financeClientEditId').value = client.id;
+    document.getElementById('financeClientName').value = client.name || '';
+    document.getElementById('financeClientPhone').value = client.phone === '-' ? '' : (client.phone || '');
+    document.getElementById('financeClientEmail').value = client.email === '-' ? '' : (client.email || '');
+    document.getElementById('financeClientAddress').value = client.address || '';
+    const title = document.getElementById('financeClientModalTitle');
+    if (title) title.textContent = 'Modifier le client';
+    openFinanceModal('financeClientModal');
+}
+
+function deleteFinanceClient(clientId) {
+    const client = (db.clients || []).find(item => String(item.id) === String(clientId));
+    if (!client || client.id === 'divers') return;
+    const hasHistory = (db.invoices || []).some(invoice => String(invoice.clientId) === String(clientId))
+        || (db.orders || []).some(order => String(order.clientId) === String(clientId))
+        || (db.customerOrders || []).some(order => String(order.clientId || order.accountId) === String(clientId));
+
+    if (hasHistory) {
+        showToast('Ce client possede un historique. Modifiez sa fiche au lieu de la supprimer.', 'warning');
+        return;
+    }
+    if (!confirm(`Supprimer le client ${client.name} ?`)) return;
+
+    db.clients = db.clients.filter(item => String(item.id) !== String(clientId));
+    saveDataImmediate();
+    renderFinancePage();
+    showToast('Client supprime', 'info');
 }
 
 function saveSupplier(event) {
@@ -1527,7 +1937,7 @@ function saveSupplier(event) {
 
     if (id) {
         const supplier = db.suppliers.find(item => item.id === id);
-        if (supplier) Object.assign(supplier, data);
+        if (supplier) Object.assign(supplier, data, { isDemo: false });
     } else {
         db.suppliers.push({
             id: `sup-${Date.now()}`,
@@ -1539,9 +1949,10 @@ function saveSupplier(event) {
     event.target.reset();
     const editInput = document.getElementById('supplierEditId');
     if (editInput) editInput.value = '';
+    closeFinanceModal('financeSupplierModal');
     saveDataImmediate();
     renderFinancePage();
-    showToast('Fournisseur enregistre', 'success');
+    showToast(id ? 'Fournisseur mis a jour' : 'Fournisseur ajoute', 'success');
 }
 
 function editSupplier(supplierId) {
@@ -1552,11 +1963,22 @@ function editSupplier(supplierId) {
     document.getElementById('supplierPhone').value = supplier.phone || '';
     document.getElementById('supplierEmail').value = supplier.email || '';
     document.getElementById('supplierAddress').value = supplier.address || '';
+    const title = document.getElementById('financeSupplierModalTitle');
+    if (title) title.textContent = 'Modifier le fournisseur';
+    openFinanceModal('financeSupplierModal');
 }
 
 function deleteSupplier(supplierId) {
-    if (!confirm('Supprimer ce fournisseur ?')) return;
-    db.suppliers = (db.suppliers || []).filter(item => item.id !== supplierId);
+    const supplier = (db.suppliers || []).find(item => String(item.id) === String(supplierId));
+    if (!supplier) return;
+    const hasHistory = (db.purchaseInvoices || []).some(invoice => String(invoice.supplierId) === String(supplierId))
+        || (db.purchaseOrders || []).some(order => String(order.supplierId) === String(supplierId));
+    if (hasHistory) {
+        showToast('Ce fournisseur possede un historique. Modifiez sa fiche au lieu de la supprimer.', 'warning');
+        return;
+    }
+    if (!confirm(`Supprimer le fournisseur ${supplier.name} ?`)) return;
+    db.suppliers = (db.suppliers || []).filter(item => String(item.id) !== String(supplierId));
     saveDataImmediate();
     renderFinancePage();
     showToast('Fournisseur supprime', 'info');
@@ -1608,6 +2030,7 @@ function createPurchaseOrder(event) {
     });
 
     event.target.reset();
+    closeFinanceModal('financePurchaseOrderModal');
     saveDataImmediate();
     renderFinancePage();
     showToast('Bon de commande cree', 'success');
@@ -1623,28 +2046,52 @@ function renderPurchaseOrders() {
         return;
     }
 
-    container.innerHTML = orders.map(order => `
-        <article class="finance-card finance-po-card status-${order.status}">
-            <div class="finance-card-head">
-                <div>
-                    <span class="finance-code">${escapeHtml(order.number)}</span>
-                    <h3>${escapeHtml(order.title)}</h3>
-                    <p>${escapeHtml(order.supplierName || 'Fournisseur')} ${order.expectedDate ? '- Attendu ' + escapeHtml(order.expectedDate) : ''}</p>
-                </div>
-                <span class="finance-status">${PURCHASE_ORDER_STATUS_LABELS[order.status] || order.status}</span>
-            </div>
-            <div class="finance-amount-grid">
-                <div><span>Lignes</span><strong>${(order.items || []).length}</strong></div>
-                <div><span>Total estime</span><strong>${formatPrice(order.total || 0)}</strong></div>
-            </div>
-            <div class="finance-actions">
-                <button class="btn btn-sm btn-outline" onclick="updatePurchaseOrderStatus('${order.id}', 'sent')" ${order.status !== 'draft' ? 'disabled' : ''}>Envoyer</button>
-                <button class="btn btn-sm btn-primary" onclick="updatePurchaseOrderStatus('${order.id}', 'received')" ${order.status === 'received' || order.status === 'cancelled' ? 'disabled' : ''}>Recu</button>
-                <button class="btn btn-sm btn-outline" onclick="printPurchaseOrder('${order.id}')">Imprimer</button>
-                <button class="btn btn-sm btn-danger" onclick="updatePurchaseOrderStatus('${order.id}', 'cancelled')" ${order.status === 'cancelled' ? 'disabled' : ''}>Annuler</button>
-            </div>
-        </article>
-    `).join('');
+    container.innerHTML = `
+        <div class="finance-table-wrap">
+            <table class="finance-public-table finance-records-table">
+                <thead>
+                    <tr>
+                        <th>Bon</th>
+                        <th>Fournisseur</th>
+                        <th>Articles</th>
+                        <th>Total estime</th>
+                        <th>Date attendue</th>
+                        <th>Statut</th>
+                        <th class="finance-actions-column">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${orders.map(order => `
+                        <tr>
+                            <td><strong class="finance-code">${escapeHtml(order.number || 'Bon')}</strong><span>${escapeHtml(order.title || 'Commande fournisseur')}</span></td>
+                            <td><strong>${escapeHtml(order.supplierName || 'Fournisseur')}</strong></td>
+                            <td><strong>${(order.items || []).length}</strong><span>ligne${(order.items || []).length > 1 ? 's' : ''}</span></td>
+                            <td><strong>${formatPrice(order.total || 0)}</strong></td>
+                            <td>${escapeHtml(order.expectedDate || 'Non definie')}</td>
+                            <td><span class="finance-row-status status-${order.status}">${PURCHASE_ORDER_STATUS_LABELS[order.status] || order.status}</span></td>
+                            <td class="finance-actions-cell">
+                                <div class="finance-table-actions">
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="updatePurchaseOrderStatus('${order.id}', 'received')" ${order.status === 'received' || order.status === 'cancelled' ? 'disabled' : ''}>Marquer recu</button>
+                                    <button class="finance-icon-button" type="button" onclick="printPurchaseOrder('${order.id}')" title="Imprimer le bon" aria-label="Imprimer le bon">
+                                        <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+                                    </button>
+                                    <details class="finance-action-menu">
+                                        <summary title="Plus d'actions" aria-label="Plus d'actions">
+                                            <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+                                        </summary>
+                                        <div class="finance-action-popover">
+                                            <button type="button" onclick="updatePurchaseOrderStatus('${order.id}', 'sent')" ${order.status !== 'draft' ? 'disabled' : ''}>Marquer envoye</button>
+                                            <button class="danger" type="button" onclick="updatePurchaseOrderStatus('${order.id}', 'cancelled')" ${order.status === 'cancelled' ? 'disabled' : ''}>Annuler le bon</button>
+                                        </div>
+                                    </details>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 function updatePurchaseOrderStatus(orderId, status) {
@@ -1702,10 +2149,14 @@ function renderFinancePage() {
     ensureFinanceDefaults();
     updateFinanceSelects();
     renderFinanceStats();
-    renderClientBalances();
+    renderFinanceDirectory();
     renderInvoices();
-    renderSuppliers();
     renderPurchaseOrders();
+
+    const clientsView = document.getElementById('financeClientsView');
+    const suppliersView = document.getElementById('financeSuppliersView');
+    if (clientsView) clientsView.hidden = financeDirectoryMode !== 'clients';
+    if (suppliersView) suppliersView.hidden = financeDirectoryMode !== 'suppliers';
 }
 
 function initFinancePage() {
@@ -1714,11 +2165,26 @@ function initFinancePage() {
         fillDbDefaults();
         ensureFinanceDefaults();
         renderFinancePage();
+        document.getElementById('financeClientForm')?.addEventListener('submit', saveFinanceClient);
         document.getElementById('manualInvoiceForm')?.addEventListener('submit', createManualInvoice);
         document.getElementById('supplierForm')?.addEventListener('submit', saveSupplier);
         document.getElementById('purchaseOrderForm')?.addEventListener('submit', createPurchaseOrder);
         document.getElementById('financeInvoiceFilter')?.addEventListener('change', renderInvoices);
         document.getElementById('financeInvoiceSearch')?.addEventListener('input', renderInvoices);
+        document.getElementById('financeDirectorySearch')?.addEventListener('input', renderFinanceDirectory);
+
+        document.querySelectorAll('.finance-editor-overlay').forEach(overlay => {
+            overlay.addEventListener('click', event => {
+                if (event.target === overlay) closeFinanceModal(overlay.id);
+            });
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            const openModal = [...document.querySelectorAll('.finance-editor-overlay')]
+                .find(modal => modal.style.display !== 'none');
+            if (openModal) closeFinanceModal(openModal.id);
+        });
     });
 }
 

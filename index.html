@@ -262,11 +262,11 @@
                             <span>+ Nouveau</span>
                         </button>
                     </div>
-                    <div class="client-selector-wrapper" style="position: relative;">
-                        <div class="client-selector-wrapper"
+                    <div class="client-selector-wrapper sale-client-picker" style="position: relative;">
+                        <div class="client-selector-wrapper sale-client-picker-row"
                             style="position: relative; display: flex; gap: 6px; align-items: center;">
-                            <div style="position: relative; flex: 1;">
-                                <select id="clientSelector" onchange="handleClientChange()"
+                            <div class="sale-client-select-control" style="position: relative; flex: 1;">
+                                <select class="sale-client-select" id="clientSelector" onchange="handleClientChange()"
                                     style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 2px solid var(--border); background: white; font-family: inherit; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); cursor: pointer; outline: none; appearance: none; transition: 0.2s;">
                                     <!-- Filled by JS -->
                                 </select>
@@ -274,7 +274,7 @@
                                     style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-light); font-size: 0.8rem;">
                                     ▼</div>
                             </div>
-                            <button onclick="editSelectedClient()" class="btn-icon-compact" title="Modifier le client"
+                            <button onclick="editSelectedClient()" class="btn-icon-compact sale-client-action" title="Modifier le client"
                                 style="padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: white; cursor: pointer;">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -282,7 +282,7 @@
                                     <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
                                 </svg>
                             </button>
-                            <button onclick="deleteSelectedClient()" class="btn-icon-compact"
+                            <button onclick="deleteSelectedClient()" class="btn-icon-compact sale-client-action danger"
                                 title="Supprimer le client"
                                 style="padding: 10px; border-radius: 10px; border: 2px solid var(--border); background: white; cursor: pointer; color: var(--danger);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"

@@ -3873,6 +3873,1015 @@ html.role-admin body:not(.client-store) textarea:focus {
     }
 }
 
+/* Premium admin UX and stable form controls */
+html.role-admin body:not(.client-store) .admin-public-topbar {
+    gap: 24px;
+}
+
+html.role-admin body:not(.client-store) .admin-public-title {
+    flex: 1 1 auto;
+    min-width: 210px;
+}
+
+html.role-admin body:not(.client-store) .admin-public-title h1,
+html.role-admin body:not(.client-store) .admin-public-title p,
+html.role-admin body:not(.client-store) .finance-premium-page * {
+    letter-spacing: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions {
+    flex: 1 1 680px;
+    max-width: 720px;
+    min-width: 0;
+    width: auto;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions > * {
+    min-width: 0;
+}
+
+html.role-admin body:not(.client-store) .admin-public-search,
+html.role-admin body:not(.client-store) .admin-public-actions .search-box {
+    box-shadow: 0 1px 2px rgba(16, 32, 51, 0.03);
+    flex: 1 1 270px;
+    height: 42px;
+    max-width: 330px;
+    min-width: 220px;
+    padding: 0 13px !important;
+    transition: border-color 160ms ease, box-shadow 160ms ease !important;
+    width: clamp(220px, 25vw, 330px) !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-search:focus-within,
+html.role-admin body:not(.client-store) .admin-public-actions .search-box:focus-within,
+html.role-admin body:not(.client-store) .customer-order-search:focus-within {
+    border-color: #2e7d32 !important;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.11) !important;
+    width: clamp(220px, 25vw, 330px) !important;
+}
+
+html.role-admin body:not(.client-store) .search-box .search-icon,
+html.role-admin body:not(.client-store) .customer-order-search .search-icon {
+    align-items: center;
+    color: #68717d;
+    display: flex;
+    flex: 0 0 18px;
+    height: 18px;
+    justify-content: center;
+    left: auto !important;
+    opacity: 1 !important;
+    position: static !important;
+    top: auto !important;
+    transform: none !important;
+    width: 18px;
+}
+
+html.role-admin body:not(.client-store) .search-box .search-icon svg,
+html.role-admin body:not(.client-store) .customer-order-search .search-icon svg {
+    display: block;
+    height: 17px !important;
+    width: 17px !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .search-box input,
+html.role-admin body:not(.client-store) .customer-order-search input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .btn,
+html.role-admin body:not(.client-store) .finance-premium-page .btn,
+html.role-admin body:not(.client-store) .finance-editor-overlay .btn {
+    align-items: center;
+    display: inline-flex;
+    gap: 8px;
+    justify-content: center;
+    line-height: 1.1;
+    min-height: 42px;
+    padding: 0 16px;
+    white-space: nowrap;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .btn {
+    flex: 0 0 auto;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .btn svg,
+html.role-admin body:not(.client-store) .finance-premium-page .btn svg,
+html.role-admin body:not(.client-store) .finance-editor-overlay .btn svg {
+    fill: none;
+    flex: 0 0 17px;
+    height: 17px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.3;
+    width: 17px;
+}
+
+html.role-admin body:not(.client-store) .customer-orders-toolbar {
+    background: #fff;
+    border: 1px solid #e3e8eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(16, 32, 51, 0.05);
+    min-height: 66px;
+    padding: 11px 12px;
+}
+
+html.role-admin body:not(.client-store) .customer-orders-toolbar .customer-order-search {
+    display: flex !important;
+    flex: 1 1 420px;
+    gap: 10px;
+    height: 44px;
+    max-width: 520px !important;
+    min-width: 260px;
+    padding: 0 14px !important;
+    width: auto !important;
+}
+
+html.role-admin body:not(.client-store) .customer-order-filter {
+    height: 44px;
+    min-width: 210px;
+}
+
+body:not(.client-store) .top-navbar > .navbar-actions .search-box {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    display: flex;
+    gap: 9px;
+    height: 42px;
+    padding: 0 13px;
+    width: 240px;
+}
+
+body:not(.client-store) .top-navbar > .navbar-actions .search-box:focus-within {
+    border-color: rgba(255, 255, 255, 0.55);
+    width: 270px;
+}
+
+body:not(.client-store) .top-navbar > .navbar-actions .search-box .search-icon {
+    align-items: center;
+    display: flex;
+    flex: 0 0 18px;
+    height: 18px;
+    justify-content: center;
+    left: auto;
+    opacity: 0.82;
+    position: static;
+    top: auto;
+    transform: none;
+    width: 18px;
+}
+
+body:not(.client-store) .top-navbar > .navbar-actions .search-box input {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    outline: 0;
+    padding: 0;
+    width: auto;
+}
+
+/* Finance directory */
+html.role-admin body:not(.client-store) .finance-premium-page {
+    gap: 22px;
+    padding-bottom: 30px !important;
+}
+
+html.role-admin body:not(.client-store) .finance-premium-page [hidden] {
+    display: none !important;
+}
+
+html.role-admin body:not(.client-store) .finance-overview {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    margin-bottom: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-overview .finance-stat {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    min-height: 132px !important;
+    overflow: hidden;
+    padding: 21px !important;
+    position: relative;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-copy {
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-copy > span {
+    display: block;
+    line-height: 1.25;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-copy > strong {
+    font-size: clamp(1.45rem, 2vw, 1.92rem) !important;
+    letter-spacing: 0 !important;
+    overflow-wrap: anywhere;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-copy small {
+    color: #82909a;
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 650;
+    margin-top: 9px;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-copy small b {
+    color: inherit;
+    font-size: inherit;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-icon {
+    align-items: center;
+    background: #e8f5e9;
+    border-radius: 8px;
+    color: #2e7d32 !important;
+    display: flex !important;
+    flex: 0 0 46px;
+    height: 46px;
+    justify-content: center;
+    margin-left: 12px;
+    padding: 0;
+    width: 46px;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-icon svg {
+    fill: none;
+    height: 23px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.1;
+    width: 23px;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-invoices .finance-stat-icon {
+    background: #fff4df;
+    color: #d97706 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-stat-orders .finance-stat-icon {
+    background: #feecec;
+    color: #c62828 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-panel,
+html.role-admin body:not(.client-store) .finance-records-panel {
+    overflow: visible !important;
+    padding: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-head,
+html.role-admin body:not(.client-store) .finance-records-head {
+    align-items: center;
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    margin: 0 !important;
+    padding: 22px 22px 18px;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-head h3,
+html.role-admin body:not(.client-store) .finance-records-head h3 {
+    font-size: 1.18rem !important;
+    margin: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-section-description {
+    color: #74808a;
+    font-size: 0.82rem;
+    margin: 7px 0 0;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-actions,
+html.role-admin body:not(.client-store) .finance-editor-footer {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-bar {
+    align-items: center;
+    background: #f8faf9;
+    border-bottom: 1px solid #e2e7e4;
+    border-top: 1px solid #e2e7e4;
+    display: flex;
+    gap: 18px;
+    justify-content: space-between;
+    padding: 12px 22px;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-tabs {
+    align-items: center;
+    background: #e9eeeb;
+    border-radius: 7px;
+    display: inline-flex;
+    gap: 3px;
+    padding: 4px;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-tab {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 5px;
+    color: #52605a;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    gap: 8px;
+    height: 36px;
+    padding: 0 13px;
+    white-space: nowrap;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-tab.active {
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(16, 32, 51, 0.12);
+    color: #1f5e36;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-tab span {
+    align-items: center;
+    background: #dce6df;
+    border-radius: 999px;
+    color: #365443;
+    display: inline-flex;
+    font-size: 0.7rem;
+    height: 21px;
+    justify-content: center;
+    min-width: 21px;
+    padding: 0 6px;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-tab.active span {
+    background: #e6f4e9;
+    color: #2e7d32;
+}
+
+html.role-admin body:not(.client-store) .finance-search-control {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d5ddd8;
+    border-radius: 7px;
+    display: flex;
+    gap: 10px;
+    height: 42px;
+    max-width: 360px;
+    padding: 0 13px;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+    width: min(360px, 100%);
+}
+
+html.role-admin body:not(.client-store) .finance-search-control:focus-within {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.11);
+}
+
+html.role-admin body:not(.client-store) .finance-search-control svg {
+    fill: none;
+    flex: 0 0 17px;
+    height: 17px;
+    stroke: #75817a;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.2;
+    width: 17px;
+}
+
+html.role-admin body:not(.client-store) .finance-search-control input {
+    background: transparent;
+    border: 0;
+    color: #183024;
+    flex: 1 1 auto;
+    font: inherit;
+    font-size: 0.84rem;
+    min-width: 0;
+    outline: 0;
+    padding: 0;
+    width: auto;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-content,
+html.role-admin body:not(.client-store) .finance-records-list {
+    min-width: 0;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-table-wrap,
+html.role-admin body:not(.client-store) .finance-records-list .finance-table-wrap {
+    border-radius: 0 0 8px 8px;
+}
+
+html.role-admin body:not(.client-store) .finance-directory-table-wrap .finance-public-table,
+html.role-admin body:not(.client-store) .finance-records-table {
+    min-width: 1050px;
+}
+
+html.role-admin body:not(.client-store) .finance-public-table tbody tr {
+    transition: background-color 140ms ease;
+}
+
+html.role-admin body:not(.client-store) .finance-public-table td {
+    height: 72px;
+}
+
+html.role-admin body:not(.client-store) .finance-contact-cell {
+    align-items: center;
+    display: flex;
+    gap: 11px;
+    min-width: 210px;
+}
+
+html.role-admin body:not(.client-store) .finance-contact-cell > div {
+    min-width: 0;
+}
+
+html.role-admin body:not(.client-store) .finance-contact-avatar {
+    align-items: center;
+    background: #e7f3ea;
+    border: 1px solid #d4e7d9;
+    border-radius: 50%;
+    color: #216b36 !important;
+    display: flex !important;
+    flex: 0 0 38px;
+    font-size: 0.75rem !important;
+    font-weight: 900;
+    height: 38px;
+    justify-content: center;
+    margin: 0 !important;
+    width: 38px;
+}
+
+html.role-admin body:not(.client-store) .finance-contact-avatar.supplier {
+    background: #edf4fb;
+    border-color: #d7e4f0;
+    color: #245b83 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-contact-phone {
+    display: block;
+    font-size: 0.84rem;
+    white-space: nowrap;
+}
+
+html.role-admin body:not(.client-store) .finance-demo-chip {
+    background: #fff4d6;
+    border-radius: 999px;
+    color: #8d6200;
+    display: inline-flex;
+    font-size: 0.6rem;
+    font-style: normal;
+    font-weight: 850;
+    margin-top: 5px;
+    padding: 3px 6px;
+    text-transform: uppercase;
+}
+
+html.role-admin body:not(.client-store) .finance-row-status {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.7rem;
+    font-weight: 850;
+    line-height: 1;
+    padding: 7px 9px;
+    white-space: nowrap;
+}
+
+html.role-admin body:not(.client-store) .finance-row-status.is-ok,
+html.role-admin body:not(.client-store) .finance-row-status.status-paid,
+html.role-admin body:not(.client-store) .finance-row-status.status-received {
+    background: #e5f5e9;
+    color: #24733b;
+}
+
+html.role-admin body:not(.client-store) .finance-row-status.is-due,
+html.role-admin body:not(.client-store) .finance-row-status.status-unpaid,
+html.role-admin body:not(.client-store) .finance-row-status.status-cancelled {
+    background: #fdeaea;
+    color: #b32b2b;
+}
+
+html.role-admin body:not(.client-store) .finance-row-status.status-partial,
+html.role-admin body:not(.client-store) .finance-row-status.status-draft,
+html.role-admin body:not(.client-store) .finance-row-status.status-sent,
+html.role-admin body:not(.client-store) .finance-row-status.status-pending {
+    background: #fff2d8;
+    color: #a76300;
+}
+
+html.role-admin body:not(.client-store) .finance-actions-column {
+    min-width: 190px;
+    text-align: right !important;
+}
+
+html.role-admin body:not(.client-store) .finance-actions-cell {
+    position: relative;
+}
+
+html.role-admin body:not(.client-store) .finance-table-actions {
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+}
+
+html.role-admin body:not(.client-store) .finance-table-actions .btn-sm {
+    min-height: 36px;
+    padding: 0 12px;
+}
+
+html.role-admin body:not(.client-store) .finance-icon-button,
+html.role-admin body:not(.client-store) .finance-action-menu > summary {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d8dfdb;
+    border-radius: 7px;
+    color: #425049;
+    cursor: pointer;
+    display: inline-flex;
+    height: 36px;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    transition: background-color 140ms ease, border-color 140ms ease;
+    width: 36px;
+}
+
+html.role-admin body:not(.client-store) .finance-icon-button:hover,
+html.role-admin body:not(.client-store) .finance-action-menu > summary:hover {
+    background: #f1f7f3;
+    border-color: #9fb8a7;
+}
+
+html.role-admin body:not(.client-store) .finance-icon-button.danger {
+    color: #c33434;
+}
+
+html.role-admin body:not(.client-store) .finance-icon-button svg,
+html.role-admin body:not(.client-store) .finance-action-menu > summary svg {
+    fill: none;
+    height: 17px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.1;
+    width: 17px;
+}
+
+html.role-admin body:not(.client-store) .finance-action-menu {
+    position: relative;
+}
+
+html.role-admin body:not(.client-store) .finance-action-menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+html.role-admin body:not(.client-store) .finance-action-popover {
+    background: #fff;
+    border: 1px solid #dce2de;
+    border-radius: 7px;
+    box-shadow: 0 12px 28px rgba(16, 32, 51, 0.15);
+    display: grid;
+    min-width: 170px;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 30;
+}
+
+html.role-admin body:not(.client-store) .finance-action-popover button {
+    background: #fff;
+    border: 0;
+    color: #27372e;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    min-height: 39px;
+    padding: 0 13px;
+    text-align: left;
+}
+
+html.role-admin body:not(.client-store) .finance-action-popover button:hover {
+    background: #f3f7f4;
+}
+
+html.role-admin body:not(.client-store) .finance-action-popover button.danger {
+    color: #be3030;
+}
+
+html.role-admin body:not(.client-store) .finance-action-popover button:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+}
+
+html.role-admin body:not(.client-store) .finance-records-toolbar {
+    background: #f8faf9;
+    border-bottom: 1px solid #e2e7e4;
+    border-top: 1px solid #e2e7e4;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 11px 22px;
+}
+
+html.role-admin body:not(.client-store) .finance-records-toolbar .finance-search-control {
+    max-width: 420px;
+    width: min(420px, 100%);
+}
+
+html.role-admin body:not(.client-store) .finance-status-filter {
+    height: 42px;
+    min-width: 210px;
+    width: auto;
+}
+
+html.role-admin body:not(.client-store) .finance-empty {
+    border: 0;
+    border-radius: 0 0 8px 8px;
+    margin: 0;
+    min-height: 120px;
+    padding: 30px;
+}
+
+html.role-admin body:not(.client-store) .finance-empty-action {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    justify-content: center;
+}
+
+html.role-admin body:not(.client-store) .finance-empty-action > strong {
+    color: #1b2e23;
+    font-size: 1rem;
+}
+
+html.role-admin body:not(.client-store) .finance-empty-action > span {
+    color: #748078;
+    font-size: 0.82rem;
+}
+
+html.role-admin body:not(.client-store) .finance-empty-action > div {
+    display: flex;
+    gap: 9px;
+    margin-top: 5px;
+}
+
+/* Finance editor modals */
+html.role-admin body:not(.client-store) .finance-editor-overlay {
+    align-items: center;
+    background: rgba(10, 26, 17, 0.48);
+    backdrop-filter: blur(3px);
+    justify-content: center;
+    padding: 20px;
+    z-index: 1400;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-modal {
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.74);
+    border-radius: 8px;
+    box-shadow: 0 24px 70px rgba(8, 28, 16, 0.26);
+    max-width: 620px;
+    overflow: hidden;
+    width: min(620px, 96vw);
+}
+
+html.role-admin body:not(.client-store) .finance-editor-modal-wide {
+    max-width: 760px;
+    width: min(760px, 96vw);
+}
+
+html.role-admin body:not(.client-store) .finance-editor-modal .modal-header {
+    align-items: flex-start;
+    background: #f8faf9;
+    border-bottom: 1px solid #e1e7e3;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 22px 17px;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-modal .modal-header h3 {
+    color: #14271b !important;
+    font-size: 1.2rem !important;
+    margin: 0 !important;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-modal .modal-close {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d8dfdb;
+    border-radius: 7px;
+    color: #45544c;
+    display: flex;
+    font-size: 1.35rem;
+    height: 36px;
+    justify-content: center;
+    line-height: 1;
+    padding: 0 0 2px;
+    width: 36px;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-form {
+    gap: 16px;
+    padding: 22px;
+}
+
+html.role-admin body:not(.client-store) .finance-field {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+}
+
+html.role-admin body:not(.client-store) .finance-field label {
+    color: #34443b;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+html.role-admin body:not(.client-store) .finance-field small {
+    color: #7b8780;
+    font-size: 0.7rem;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-form .input {
+    background: #fff;
+    border: 1px solid #ced8d2;
+    border-radius: 7px;
+    color: #17291e;
+    font: inherit;
+    font-size: 0.88rem;
+    min-height: 46px;
+    padding: 10px 13px;
+    width: 100%;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-form textarea.input {
+    min-height: 116px;
+    resize: vertical;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-form .input:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.11);
+    outline: 0;
+}
+
+html.role-admin body:not(.client-store) .finance-editor-footer {
+    border-top: 1px solid #e3e8e5;
+    margin: 4px -22px -22px;
+    padding: 16px 22px;
+}
+
+/* Purchases supplier selector */
+body .purchase-supplier-field {
+    grid-column: span 2 !important;
+    min-width: 0;
+}
+
+body .purchase-supplier-field .inline-field-actions {
+    align-items: stretch;
+    display: grid;
+    gap: 9px;
+    grid-template-columns: minmax(260px, 1fr) 46px 46px;
+    min-width: 0;
+    width: 100%;
+}
+
+body .supplier-select-control {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cfdad3;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    min-width: 0;
+    padding: 0 12px;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+body .supplier-select-control:focus-within {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.11);
+}
+
+body .supplier-select-control > svg {
+    fill: none;
+    flex: 0 0 19px;
+    height: 19px;
+    stroke: #2e7d32;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+    width: 19px;
+}
+
+body .supplier-select-control .input {
+    appearance: auto;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #183024;
+    flex: 1 1 auto;
+    font-size: 0.9rem !important;
+    font-weight: 750;
+    height: 48px;
+    min-width: 0;
+    outline: 0;
+    padding: 0 4px !important;
+    width: auto !important;
+}
+
+body .purchase-supplier-field .mini-action-btn {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cfdad3;
+    border-radius: 8px;
+    color: #286f3d;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    width: 46px;
+}
+
+body .purchase-supplier-field .mini-action-btn:hover {
+    background: #edf7ef;
+    border-color: #78a984;
+}
+
+body .purchase-supplier-field .mini-action-btn svg {
+    fill: none;
+    height: 19px;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.3;
+    width: 19px;
+}
+
+body .purchase-date-field .input {
+    background: #fff !important;
+    border: 1px solid #cfdad3 !important;
+    border-radius: 8px !important;
+    height: 48px;
+    padding: 0 13px !important;
+}
+
+/* Sale client selector */
+body .compact-panel.client-selection {
+    background: #f7faf8;
+    border: 1px solid #d9e2dc;
+    border-radius: 8px;
+    margin: 0 10px 8px;
+    padding: 11px;
+}
+
+body .sale-client-picker-row {
+    align-items: stretch !important;
+    display: flex !important;
+    gap: 8px !important;
+}
+
+body .sale-client-select-control {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #cad6ce;
+    border-radius: 8px;
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+}
+
+body .sale-client-select-control:focus-within {
+    border-color: #2e7d32;
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+body .sale-client-select {
+    appearance: none !important;
+    background: #fff !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    color: #17291e !important;
+    cursor: pointer;
+    font-family: inherit !important;
+    font-size: 0.88rem !important;
+    font-weight: 750 !important;
+    height: 46px;
+    min-width: 0;
+    outline: 0;
+    padding: 0 36px 0 13px !important;
+    width: 100% !important;
+}
+
+body .sale-client-select-control > div {
+    color: #67756d !important;
+    right: 13px !important;
+}
+
+body .sale-client-action {
+    align-items: center;
+    background: #fff !important;
+    border: 1px solid #cad6ce !important;
+    border-radius: 8px !important;
+    color: #2e6e40;
+    display: flex;
+    flex: 0 0 46px;
+    height: 46px;
+    justify-content: center;
+    padding: 0 !important;
+    width: 46px;
+}
+
+body .sale-client-action.danger {
+    color: #c13333 !important;
+}
+
+body .sale-client-action svg {
+    height: 17px;
+    width: 17px;
+}
+
+@media (max-width: 1180px) {
+    html.role-admin body:not(.client-store) .main-area > .admin-public-topbar {
+        align-items: stretch !important;
+        flex: 0 0 auto !important;
+        flex-direction: column !important;
+        gap: 13px !important;
+        height: auto !important;
+        justify-content: flex-start !important;
+        max-height: none !important;
+        min-height: 145px !important;
+    }
+
+    html.role-admin body:not(.client-store) .admin-public-actions {
+        flex: 0 0 auto;
+        max-width: none;
+        width: 100%;
+    }
+
+    html.role-admin body:not(.client-store) .admin-public-search,
+    html.role-admin body:not(.client-store) .admin-public-actions .search-box {
+        max-width: none;
+        width: 100% !important;
+    }
+
+    html.role-admin body:not(.client-store) .finance-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 760px) {
+    html.role-admin body:not(.client-store) .finance-directory-head,
+    html.role-admin body:not(.client-store) .finance-directory-bar,
+    html.role-admin body:not(.client-store) .finance-records-head,
+    html.role-admin body:not(.client-store) .finance-records-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    html.role-admin body:not(.client-store) .finance-directory-actions,
+    html.role-admin body:not(.client-store) .finance-directory-actions .btn,
+    html.role-admin body:not(.client-store) .finance-search-control,
+    html.role-admin body:not(.client-store) .finance-records-toolbar .finance-search-control,
+    html.role-admin body:not(.client-store) .finance-status-filter {
+        max-width: none;
+        width: 100%;
+    }
+
+    html.role-admin body:not(.client-store) .finance-overview {
+        grid-template-columns: 1fr !important;
+    }
+
+    html.role-admin body:not(.client-store) .finance-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    body .purchase-supplier-field .inline-field-actions {
+        grid-template-columns: minmax(0, 1fr) 46px 46px;
+    }
+
+    body .purchase-supplier-field {
+        grid-column: 1 / -1 !important;
+    }
+}
+
 /* Exact admin layout: full-screen public dashboard clone */
 html.role-admin,
 html.role-admin body:not(.client-store) {
@@ -4483,5 +5492,60 @@ html.role-admin body:not(.client-store) .btn-outline {
     html.role-admin body:not(.client-store) .achats-summary,
     html.role-admin body:not(.client-store) .summary-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+/* Post-layout corrections kept after the full-screen admin shell */
+html.role-admin body:not(.client-store) .admin-public-search,
+html.role-admin body:not(.client-store) .admin-public-actions .search-box {
+    flex: 1 1 270px;
+    height: 42px !important;
+    max-width: 330px;
+    min-width: 220px;
+    padding: 0 13px !important;
+    width: clamp(220px, 25vw, 330px) !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .search-box:focus-within {
+    width: clamp(220px, 25vw, 330px) !important;
+}
+
+html.role-admin body:not(.client-store) .admin-public-actions .search-box input {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+}
+
+@media (max-width: 1180px) {
+    html.role-admin body:not(.client-store) .main-area > .admin-public-topbar {
+        align-items: stretch !important;
+        flex: 0 0 158px !important;
+        flex-direction: column !important;
+        gap: 13px !important;
+        height: 158px !important;
+        justify-content: flex-start !important;
+        max-height: 158px !important;
+        min-height: 158px !important;
+    }
+
+    html.role-admin body:not(.client-store) .admin-public-actions {
+        flex: 0 0 42px;
+        max-width: none;
+        min-width: 0;
+        width: 100%;
+    }
+
+    html.role-admin body:not(.client-store) .admin-public-search,
+    html.role-admin body:not(.client-store) .admin-public-actions .search-box {
+        max-width: none;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 760px) {
+    html.role-admin body:not(.client-store) .finance-overview,
+    html.role-admin body:not(.client-store) .finance-stats {
+        grid-template-columns: 1fr !important;
     }
 }

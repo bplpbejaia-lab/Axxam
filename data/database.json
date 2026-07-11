@@ -296,7 +296,32 @@
     "customerOrders": [],
     "clientAccounts": [],
     "invoices": [],
-    "suppliers": [],
+    "suppliers": [
+        {
+            "id": "demo-supplier-gouraya",
+            "name": "Emballages Gouraya",
+            "phone": "0551 80 22 14",
+            "email": "ventes@gouraya-emballage.dz",
+            "address": "Zone industrielle, Bejaia",
+            "isDemo": true
+        },
+        {
+            "id": "demo-supplier-maison-lait",
+            "name": "Maison du Lait Bejaia",
+            "phone": "0771 36 09 52",
+            "email": "contact@maisondulait.dz",
+            "address": "Oued Ghir, Bejaia",
+            "isDemo": true
+        },
+        {
+            "id": "demo-supplier-saveurs",
+            "name": "Saveurs du Djurdjura",
+            "phone": "0561 43 77 20",
+            "email": "pro@saveurs-djurdjura.dz",
+            "address": "Akbou, Bejaia",
+            "isDemo": true
+        }
+    ],
     "purchaseOrders": [],
     "purchaseInvoices": [],
     "settings": {
@@ -316,6 +341,30 @@
             "name": "Vente",
             "phone": "-",
             "email": "-"
+        },
+        {
+            "id": "demo-client-cafe-gourmand",
+            "name": "Cafe Gourmand",
+            "phone": "0550 24 18 90",
+            "email": "contact@cafegourmand.dz",
+            "address": "Centre-ville, Bejaia",
+            "isDemo": true
+        },
+        {
+            "id": "demo-client-boulangerie-bahia",
+            "name": "Boulangerie El Bahia",
+            "phone": "0770 42 31 08",
+            "email": "commandes@elbahia.dz",
+            "address": "Sidi Ahmed, Bejaia",
+            "isDemo": true
+        },
+        {
+            "id": "demo-client-hotel-atlas",
+            "name": "Hotel Atlas",
+            "phone": "0560 11 64 22",
+            "email": "achats@hotelatlas.dz",
+            "address": "Route des Aures, Bejaia",
+            "isDemo": true
         }
     ],
     "productions": [],
