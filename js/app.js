@@ -4828,7 +4828,7 @@ function calculateCostsForOrders(orders, costContext = null) {
     return costs;
 }
 
-function getAggregatedChartData(period) {
+function getLegacyAggregatedChartData(period) {
     const now = new Date();
     const labels = [];
     const profits = [];
@@ -4933,6 +4933,248 @@ function getAggregatedChartData(period) {
     return { labels, revenues: profits, expenses: withdrawalsData };
 }
 
+function getStatsDate(value) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getStatsLocalDate(value, endOfDay = false) {
+    if (!value) return null;
+    const date = new Date(`${value}T${endOfDay ? '23:59:59.999' : '00:00:00'}`);
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function getStatsBucketTotals(start, end) {
+    const isInside = value => {
+        const date = getStatsDate(value);
+        return date && date >= start && date <= end;
+    };
+
+    const revenue = (db.orders || [])
+        .filter(order => isInside(order.date))
+        .reduce((sum, order) => sum + getOrderNetTotal(order), 0);
+
+    const purchaseInvoices = (db.purchaseInvoices || [])
+        .filter(invoice => invoice.status !== 'cancelled' && isInside(invoice.date || invoice.createdAt));
+    const invoiceCosts = purchaseInvoices.reduce((sum, invoice) => {
+        const total = typeof getPurchaseInvoiceNetTotal === 'function'
+            ? getPurchaseInvoiceNetTotal(invoice)
+            : (parseFloat(invoice.total) || 0);
+        return sum + total;
+    }, 0);
+
+    const legacyLotCosts = (db.lots || [])
+        .filter(lot => !lot.purchaseInvoiceId && isInside(lot.date || lot.createdAt))
+        .reduce((sum, lot) => sum + Math.max(0, (parseFloat(lot.totalPrice) || 0) - (parseFloat(lot.returnedTotal) || 0)), 0);
+
+    const legacyProductCosts = (db.adjustments || [])
+        .filter(adjustment => adjustment.quantity > 0 && !adjustment.purchaseInvoiceId && isInside(adjustment.date))
+        .reduce((sum, adjustment) => {
+            const product = getProductById(adjustment.productId);
+            return sum + ((parseFloat(adjustment.quantity) || 0) * (parseFloat(product?.purchasePrice) || 0));
+        }, 0);
+
+    return {
+        revenue: Number(revenue.toFixed(2)),
+        expenses: Number((invoiceCosts + legacyLotCosts + legacyProductCosts).toFixed(2))
+    };
+}
+
+function buildStatsDailyBuckets(start, end) {
+    const buckets = [];
+    const cursor = new Date(start);
+    cursor.setHours(0, 0, 0, 0);
+    const limit = new Date(end);
+    limit.setHours(23, 59, 59, 999);
+
+    while (cursor <= limit && buckets.length < 62) {
+        const bucketStart = new Date(cursor);
+        const bucketEnd = new Date(cursor);
+        bucketEnd.setHours(23, 59, 59, 999);
+        buckets.push({
+            label: bucketStart.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
+            start: bucketStart,
+            end: bucketEnd
+        });
+        cursor.setDate(cursor.getDate() + 1);
+    }
+    return buckets;
+}
+
+function buildStatsMonthlyBuckets(start, end) {
+    const buckets = [];
+    const cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+    const limit = new Date(end.getFullYear(), end.getMonth(), 1);
+
+    while (cursor <= limit && buckets.length < 18) {
+        const bucketStart = new Date(cursor);
+        const bucketEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0, 23, 59, 59, 999);
+        buckets.push({
+            label: bucketStart.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', ''),
+            start: bucketStart,
+            end: bucketEnd
+        });
+        cursor.setMonth(cursor.getMonth() + 1);
+    }
+    return buckets;
+}
+
+function getStatsChartBuckets(period) {
+    const now = new Date();
+    const todayEnd = new Date(now);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    if (period === 'range') {
+        const start = getStatsLocalDate(document.getElementById('dashFilterStart')?.value);
+        const end = getStatsLocalDate(document.getElementById('dashFilterEnd')?.value, true);
+        if (start && end && start <= end) {
+            const dayCount = Math.floor((end - start) / 86400000) + 1;
+            return dayCount <= 45 ? buildStatsDailyBuckets(start, end) : buildStatsMonthlyBuckets(start, end);
+        }
+    }
+
+    if (period === 'month') {
+        return buildStatsDailyBuckets(new Date(now.getFullYear(), now.getMonth(), 1), todayEnd);
+    }
+
+    if (period === 'year') {
+        return buildStatsMonthlyBuckets(new Date(now.getFullYear(), 0, 1), todayEnd);
+    }
+
+    if (period === 'all') {
+        const dateCandidates = [
+            ...(db.orders || []).map(order => getStatsDate(order.date)),
+            ...(db.purchaseInvoices || []).map(invoice => getStatsDate(invoice.date || invoice.createdAt)),
+            ...(db.lots || []).map(lot => getStatsDate(lot.date || lot.createdAt))
+        ].filter(Boolean).sort((a, b) => a - b);
+        const earliest = dateCandidates[0] || new Date(now.getFullYear(), now.getMonth() - 11, 1);
+        const monthDistance = ((now.getFullYear() - earliest.getFullYear()) * 12) + now.getMonth() - earliest.getMonth();
+        const start = monthDistance > 17
+            ? new Date(now.getFullYear(), now.getMonth() - 17, 1)
+            : new Date(earliest.getFullYear(), earliest.getMonth(), 1);
+        return buildStatsMonthlyBuckets(start, todayEnd);
+    }
+
+    const start = new Date(now);
+    start.setDate(start.getDate() - 6);
+    return buildStatsDailyBuckets(start, todayEnd);
+}
+
+function getAggregatedChartData(period) {
+    try {
+        const buckets = getStatsChartBuckets(period);
+        const revenues = [];
+        const expenses = [];
+
+        buckets.forEach(bucket => {
+            const totals = getStatsBucketTotals(bucket.start, bucket.end);
+            revenues.push(totals.revenue);
+            expenses.push(totals.expenses);
+        });
+
+        return {
+            labels: buckets.map(bucket => bucket.label),
+            revenues,
+            expenses
+        };
+    } catch (error) {
+        console.warn('Aggregation premium indisponible, utilisation du calcul compatible:', error);
+        return getLegacyAggregatedChartData(period);
+    }
+}
+
+function getStatsExampleChartData(labels, period) {
+    const monthly = ['year', 'all'].includes(period) || labels.length > 20;
+    const scale = monthly ? 7.5 : 1;
+    const salesPattern = [14800, 17100, 16450, 20500, 19300, 23800, 26100, 24900, 28700, 27600, 31500, 30200];
+    const purchasePattern = [6200, 7900, 7100, 9300, 8400, 10800, 9800, 11700, 12100, 10600, 13400, 12800];
+
+    return {
+        labels,
+        revenues: labels.map((_, index) => Math.round(salesPattern[index % salesPattern.length] * scale)),
+        expenses: labels.map((_, index) => Math.round(purchasePattern[index % purchasePattern.length] * scale))
+    };
+}
+
+function formatStatsCompactCurrency(value) {
+    const amount = Number(value) || 0;
+    const absolute = Math.abs(amount);
+    if (absolute >= 1000000) return `${(amount / 1000000).toFixed(absolute >= 10000000 ? 0 : 1).replace('.', ',')} M DA`;
+    if (absolute >= 1000) return `${(amount / 1000).toFixed(absolute >= 100000 ? 0 : 1).replace('.', ',')} k DA`;
+    return `${Math.round(amount)} DA`;
+}
+
+function formatStatsCurrency(value) {
+    return `${new Intl.NumberFormat('fr-FR', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+    }).format(Number(value) || 0)} DA`;
+}
+
+function getStatsSeriesTrend(series) {
+    const active = series.filter(value => Number(value) > 0);
+    if (active.length < 2 || active[0] === 0) return { value: 0, label: `${active.length} point${active.length > 1 ? 's' : ''} actif${active.length > 1 ? 's' : ''}` };
+    const change = ((active[active.length - 1] - active[0]) / active[0]) * 100;
+    return {
+        value: change,
+        label: `${change >= 0 ? '+' : ''}${change.toFixed(1).replace('.', ',')}% sur la periode`
+    };
+}
+
+function updateStatsComparisonSummary(data, isDemo, period) {
+    const salesTotal = data.revenues.reduce((sum, value) => sum + value, 0);
+    const purchaseTotal = data.expenses.reduce((sum, value) => sum + value, 0);
+    const gap = salesTotal - purchaseTotal;
+    const ratio = salesTotal > 0 ? (purchaseTotal / salesTotal) * 100 : 0;
+    const salesTrend = getStatsSeriesTrend(data.revenues);
+    const purchaseTrend = getStatsSeriesTrend(data.expenses);
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    };
+
+    setText('comparisonSalesTotal', formatStatsCurrency(salesTotal));
+    setText('comparisonPurchaseTotal', formatStatsCurrency(purchaseTotal));
+    setText('comparisonNetGap', formatStatsCurrency(gap));
+    setText('comparisonPurchaseRatio', `${ratio.toFixed(1).replace('.', ',')}%`);
+    setText('comparisonSalesTrend', salesTrend.label);
+    setText('comparisonPurchaseTrend', purchaseTrend.label);
+    setText('comparisonGapStatus', gap >= 0 ? 'Flux positif' : 'Achats superieurs aux ventes');
+
+    const periodLabels = {
+        day: '(7 derniers jours)',
+        week: '(7 derniers jours)',
+        month: '(ce mois)',
+        year: '(cette annee)',
+        all: '(historique recent)',
+        range: '(periode selectionnee)'
+    };
+    setText('statsComparisonRangeLabel', periodLabels[period] || '');
+
+    const badge = document.getElementById('comparisonDataBadge');
+    if (badge) {
+        badge.textContent = isDemo ? 'Donnees exemple' : 'Donnees reelles';
+        badge.classList.toggle('is-demo', isDemo);
+    }
+
+    const gapElement = document.getElementById('comparisonNetGap');
+    gapElement?.classList.toggle('is-negative', gap < 0);
+
+    const insight = document.querySelector('#comparisonInsight p');
+    if (insight) {
+        const prefix = isDemo ? 'Apercu exemple. ' : '';
+        if (salesTotal <= 0 && purchaseTotal <= 0) {
+            insight.textContent = `${prefix}Aucun flux financier sur cette periode.`;
+        } else if (ratio <= 55) {
+            insight.textContent = `${prefix}Les achats absorbent ${ratio.toFixed(1).replace('.', ',')}% des ventes, avec un ecart positif de ${formatStatsCurrency(Math.max(0, gap))}.`;
+        } else if (ratio <= 85) {
+            insight.textContent = `${prefix}Les achats representent ${ratio.toFixed(1).replace('.', ',')}% des ventes. Surveillez l'evolution de l'ecart net.`;
+        } else {
+            insight.textContent = `${prefix}Le cout des achats est eleve par rapport aux ventes (${ratio.toFixed(1).replace('.', ',')}%).`;
+        }
+    }
+}
+
 function openMovementsModal() {
     const modal = document.getElementById('stockMovementsModal');
     if (!modal) return;
@@ -4954,8 +5196,10 @@ function openMovementsModal() {
 function renderWithdrawalsVsProfitChart(period) {
     const canvas = document.getElementById('withdrawalsProfitChart');
     if (!canvas) return;
+    const chartShell = canvas.closest('.stats-chart-shell');
 
     if (typeof Chart === 'undefined') {
+        chartShell?.classList.add('is-loading');
         if (statsChartRetryTimer) clearTimeout(statsChartRetryTimer);
         if (statsChartRetryCount < 20) {
             statsChartRetryCount += 1;
@@ -4969,10 +5213,49 @@ function renderWithdrawalsVsProfitChart(period) {
         statsChartRetryTimer = null;
     }
     statsChartRetryCount = 0;
+    chartShell?.classList.remove('is-loading');
 
     if (statsChart) statsChart.destroy();
 
-    const data = getAggregatedChartData(period);
+    const realData = getAggregatedChartData(period);
+    const hasRealData = realData.revenues.some(value => value > 0) || realData.expenses.some(value => value > 0);
+    const data = hasRealData ? realData : getStatsExampleChartData(realData.labels, period);
+    updateStatsComparisonSummary(data, !hasRealData, period);
+
+    document.querySelectorAll('.stats-legend-toggle').forEach(button => {
+        button.classList.add('active');
+        button.setAttribute('aria-pressed', 'true');
+    });
+
+    const context = canvas.getContext('2d');
+    const chartHeight = Math.max(320, chartShell?.clientHeight || 360);
+    const salesGradient = context.createLinearGradient(0, 0, 0, chartHeight);
+    salesGradient.addColorStop(0, 'rgba(46, 125, 50, 0.20)');
+    salesGradient.addColorStop(0.7, 'rgba(46, 125, 50, 0.035)');
+    salesGradient.addColorStop(1, 'rgba(46, 125, 50, 0)');
+    const purchaseGradient = context.createLinearGradient(0, 0, 0, chartHeight);
+    purchaseGradient.addColorStop(0, 'rgba(229, 115, 78, 0.15)');
+    purchaseGradient.addColorStop(0.7, 'rgba(229, 115, 78, 0.025)');
+    purchaseGradient.addColorStop(1, 'rgba(229, 115, 78, 0)');
+
+    const crosshairPlugin = {
+        id: 'statsPremiumCrosshair',
+        afterDatasetsDraw(chart) {
+            const activeElements = chart.tooltip?.getActiveElements?.() || [];
+            if (!activeElements.length) return;
+            const x = activeElements[0].element.x;
+            const { ctx, chartArea } = chart;
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x, chartArea.top);
+            ctx.lineTo(x, chartArea.bottom);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(72, 86, 78, 0.18)';
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
 
     statsChart = new Chart(canvas, {
         type: 'line',
@@ -4982,46 +5265,81 @@ function renderWithdrawalsVsProfitChart(period) {
                 {
                     label: 'Ventes',
                     data: data.revenues,
-                    borderColor: '#4CAF50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderColor: '#2e7d32',
+                    backgroundColor: salesGradient,
                     fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#4CAF50'
+                    tension: 0.38,
+                    cubicInterpolationMode: 'monotone',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBorderWidth: 3,
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#2e7d32'
                 },
                 {
                     label: 'Achats',
                     data: data.expenses,
-                    borderColor: '#F44336',
-                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    borderColor: '#e5734e',
+                    backgroundColor: purchaseGradient,
                     fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#F44336'
+                    tension: 0.38,
+                    cubicInterpolationMode: 'monotone',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHoverBorderWidth: 3,
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBackgroundColor: '#e5734e'
                 }
             ]
         },
+        plugins: [crosshairPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            normalized: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            animation: {
+                duration: 650,
+                easing: 'easeOutQuart'
+            },
+            layout: {
+                padding: { top: 8, right: 8, bottom: 0, left: 4 }
+            },
             plugins: {
                 legend: {
-                    position: 'top',
-                    labels: {
-                        usePointStyle: true,
-                        padding: 20,
-                        font: { size: 12, weight: '600', family: "'Inter', sans-serif" }
-                    }
+                    display: false
                 },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    padding: 12,
+                    enabled: true,
+                    backgroundColor: '#10251a',
+                    titleColor: '#ffffff',
+                    bodyColor: 'rgba(255, 255, 255, 0.82)',
+                    borderColor: 'rgba(255, 255, 255, 0.12)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    padding: 13,
+                    boxPadding: 5,
+                    usePointStyle: true,
+                    displayColors: true,
+                    titleFont: { family: "'Inter', sans-serif", size: 12, weight: '700' },
+                    bodyFont: { family: "'Inter', sans-serif", size: 12, weight: '600' },
                     callbacks: {
-                        label: function (context) {
-                            return context.dataset.label + ': ' + formatPrice(context.parsed.y);
+                        label(context) {
+                            return ` ${context.dataset.label}: ${formatStatsCurrency(context.parsed.y)}`;
+                        },
+                        footer(items) {
+                            if (items.length < 2) return '';
+                            const values = items.reduce((result, item) => {
+                                result[item.datasetIndex] = item.parsed.y;
+                                return result;
+                            }, {});
+                            if (values[0] === undefined || values[1] === undefined) return '';
+                            return `Ecart: ${formatStatsCurrency(values[0] - values[1])}`;
                         }
                     }
                 }
@@ -5029,19 +5347,42 @@ function renderWithdrawalsVsProfitChart(period) {
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: 'rgba(0,0,0,0.05)' },
+                    border: { display: false },
+                    grid: {
+                        color: 'rgba(74, 91, 81, 0.08)',
+                        drawTicks: false
+                    },
                     ticks: {
-                        callback: function (value) { return value + ' DA'; },
-                        font: { family: "'Inter', sans-serif" }
+                        callback(value) { return formatStatsCompactCurrency(value); },
+                        color: '#7c8981',
+                        padding: 11,
+                        font: { family: "'Inter', sans-serif", size: 11, weight: '600' }
                     }
                 },
                 x: {
+                    border: { display: false },
                     grid: { display: false },
-                    ticks: { font: { family: "'Inter', sans-serif" } }
+                    ticks: {
+                        autoSkip: true,
+                        maxTicksLimit: period === 'month' ? 10 : 12,
+                        maxRotation: 0,
+                        color: '#7c8981',
+                        padding: 9,
+                        font: { family: "'Inter', sans-serif", size: 11, weight: '600' }
+                    }
                 }
             }
         }
     });
+}
+
+function toggleStatsComparisonDataset(datasetIndex, button) {
+    if (!statsChart) return;
+    const nextVisible = !statsChart.isDatasetVisible(datasetIndex);
+    statsChart.setDatasetVisibility(datasetIndex, nextVisible);
+    statsChart.update();
+    button?.classList.toggle('active', nextVisible);
+    button?.setAttribute('aria-pressed', nextVisible ? 'true' : 'false');
 }
 
 function renderOrdersTableFiltered(orders) {
@@ -5206,7 +5547,7 @@ function renderTopProductsFiltered(orders) {
     }
 }
 
-function renderClientPurchaseStats(orders) {
+function renderLegacyClientPurchaseStats(orders) {
     const revenueContainer = document.getElementById('clientRevenueContainer');
 
     if (!revenueContainer) return;
@@ -5364,6 +5705,112 @@ function scrollClients(direction) {
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     } else {
         container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+
+function renderClientPurchaseStats(orders) {
+    try {
+    const revenueContainer = document.getElementById('clientRevenueContainer');
+    if (!revenueContainer) return;
+
+    const clientStats = {};
+    (orders || []).forEach(order => {
+        const netTotal = getOrderNetTotal(order);
+        if (netTotal <= 0) return;
+        const clientId = String(order.clientId || 'divers');
+        const client = getClientById(clientId);
+
+        if (!clientStats[clientId]) {
+            clientStats[clientId] = {
+                id: clientId,
+                name: client?.name || 'Vente',
+                totalRevenue: 0,
+                orderCount: 0,
+                isDemo: false
+            };
+        }
+
+        clientStats[clientId].totalRevenue += netTotal;
+        clientStats[clientId].orderCount += 1;
+    });
+
+    let clients = Object.values(clientStats).sort((a, b) => b.totalRevenue - a.totalRevenue);
+    const isDemo = clients.length === 0;
+
+    if (isDemo) {
+        clients = [
+            { id: 'demo-client-boulangerie-bahia', name: 'Boulangerie El Bahia', totalRevenue: 48300, orderCount: 18, isDemo: true },
+            { id: 'demo-client-cafe-gourmand', name: 'Cafe Gourmand', totalRevenue: 32750, orderCount: 12, isDemo: true },
+            { id: 'demo-client-hotel-atlas', name: 'Hotel Atlas', totalRevenue: 21900, orderCount: 7, isDemo: true },
+            { id: 'demo-client-comptoir', name: 'Vente comptoir', totalRevenue: 14600, orderCount: 34, isDemo: true }
+        ];
+    }
+
+    const totalRevenue = clients.reduce((sum, client) => sum + client.totalRevenue, 0);
+    const totalOrders = clients.reduce((sum, client) => sum + client.orderCount, 0);
+    const maxRevenue = Math.max(...clients.map(client => client.totalRevenue), 1);
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    };
+
+    setText('clientRevenueTotal', formatStatsCurrency(totalRevenue));
+    setText('clientRevenueActiveCount', clients.length);
+    setText('clientRevenueAverageOrder', formatStatsCurrency(totalOrders > 0 ? totalRevenue / totalOrders : 0));
+    setText('clientRevenueLeader', clients[0]?.name || '-');
+
+    const badge = document.getElementById('clientRevenueDataBadge');
+    if (badge) {
+        badge.textContent = isDemo ? 'Donnees exemple' : 'Donnees reelles';
+        badge.classList.toggle('is-demo', isDemo);
+    }
+
+    const periodLabelEl = document.getElementById('clientsPeriodLabel');
+    if (periodLabelEl) {
+        const periodLabels = {
+            day: "d'aujourd'hui",
+            week: 'de la semaine',
+            month: 'du mois',
+            year: "de l'annee",
+            all: 'toutes periodes',
+            range: 'de la periode selectionnee'
+        };
+        periodLabelEl.textContent = periodLabels[currentStatsPeriod] || '';
+    }
+
+    revenueContainer.innerHTML = clients.map((client, index) => {
+        const share = totalRevenue > 0 ? (client.totalRevenue / totalRevenue) * 100 : 0;
+        const barWidth = Math.max(6, (client.totalRevenue / maxRevenue) * 100);
+        const averageOrder = client.orderCount > 0 ? client.totalRevenue / client.orderCount : 0;
+        const initials = getFinanceInitials(client.name);
+
+        return `
+            <article class="stats-client-revenue-row ${index === 0 ? 'is-leader' : ''}" style="--client-revenue-width:${barWidth.toFixed(2)}%">
+                <div class="stats-client-rank rank-${Math.min(index + 1, 4)}">${String(index + 1).padStart(2, '0')}</div>
+                <div class="stats-client-avatar">${escapeHtml(initials)}</div>
+                <div class="stats-client-identity">
+                    <strong>${escapeHtml(client.name)}</strong>
+                    <span>${client.orderCount} commande${client.orderCount > 1 ? 's' : ''}</span>
+                </div>
+                <div class="stats-client-metric">
+                    <span>Panier moyen</span>
+                    <strong>${formatStatsCurrency(averageOrder)}</strong>
+                </div>
+                <div class="stats-client-metric contribution">
+                    <span>Contribution</span>
+                    <strong>${share.toFixed(1).replace('.', ',')}%</strong>
+                </div>
+                <div class="stats-client-revenue-value">
+                    <span>Chiffre d'affaires</span>
+                    <strong>${formatStatsCurrency(client.totalRevenue)}</strong>
+                </div>
+                <div class="stats-client-progress" aria-hidden="true"><span></span></div>
+            </article>
+        `;
+    }).join('');
+    } catch (error) {
+        console.warn('Classement client premium indisponible, utilisation du rendu compatible:', error);
+        renderLegacyClientPurchaseStats(orders);
     }
 }
 

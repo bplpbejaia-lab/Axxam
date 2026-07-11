@@ -363,44 +363,74 @@
                     </div>
                 </div>
 
-                <!-- Client Purchase Statistics -->
-                <h3 class="mt-xl mb-md"
-                    style="color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
-                    Chiffre d'Affaires par Client <span id="clientsPeriodLabel"></span></h3>
-                <div class="card mb-xl">
-                    <!-- Client Revenue Horizontal Scroll -->
-                    <div id="clientRevenueScrollContainer" style="position: relative;">
-                        <div id="clientRevenueContainer"
-                            style="display: flex; gap: 16px; overflow-x: auto; padding: 16px; scroll-behavior: smooth; scrollbar-width: thin;">
+                <!-- Client revenue ranking -->
+                <section class="stats-premium-panel stats-client-revenue-panel mb-xl">
+                    <header class="stats-premium-head">
+                        <div class="stats-premium-heading">
+                            <span class="stats-premium-icon client" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </span>
+                            <div>
+                                <p class="stats-premium-eyebrow">Performance commerciale</p>
+                                <h3>Chiffre d'affaires par client</h3>
+                                <p>Classement, contribution et panier moyen <span id="clientsPeriodLabel"></span></p>
+                            </div>
                         </div>
-                        <!-- Left Scroll Arrow -->
-                        <button id="scrollLeft"
-                            style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(74, 44, 42, 0.8); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
-                            onclick="scrollClients('left')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="15 18l-6-6 6-6"></polyline>
-                            </svg>
-                        </button>
-                        <!-- Right Scroll Arrow -->
-                        <button id="scrollRight"
-                            style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); z-index: 10; background: rgba(74, 44, 42, 0.8); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;"
-                            onclick="scrollClients('right')">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18l6-6-6-6"></polyline>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                        <span class="stats-data-badge" id="clientRevenueDataBadge">Donnees reelles</span>
+                    </header>
 
-                <!-- Withdrawals VS Profit Evolution -->
-                <h3 class="mt-xl mb-md"
-                    style="color: var(--text-light); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
-                    Comparaison : Coût des Achats vs Volume de Ventes</h3>
-                <div class="card mb-xl" style="height: 400px; padding: 20px;">
-                    <canvas id="withdrawalsProfitChart"></canvas>
-                </div>
+                    <div class="stats-client-summary" aria-label="Resume clients">
+                        <div><span>CA analyse</span><strong id="clientRevenueTotal">0,0 DA</strong></div>
+                        <div><span>Clients actifs</span><strong id="clientRevenueActiveCount">0</strong></div>
+                        <div><span>Panier moyen</span><strong id="clientRevenueAverageOrder">0,0 DA</strong></div>
+                        <div><span>Client principal</span><strong id="clientRevenueLeader">-</strong></div>
+                    </div>
+
+                    <div id="clientRevenueContainer" class="stats-client-revenue-list"></div>
+                </section>
+
+                <!-- Purchases versus sales evolution -->
+                <section class="stats-premium-panel stats-comparison-panel mb-xl">
+                    <header class="stats-premium-head">
+                        <div class="stats-premium-heading">
+                            <span class="stats-premium-icon chart" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m7 16 4-5 4 3 5-7"/></svg>
+                            </span>
+                            <div>
+                                <p class="stats-premium-eyebrow">Flux financier</p>
+                                <h3>Achats vs volume de ventes</h3>
+                                <p>Evolution comparee et ecart net <span id="statsComparisonRangeLabel"></span></p>
+                            </div>
+                        </div>
+                        <span class="stats-data-badge" id="comparisonDataBadge">Donnees reelles</span>
+                    </header>
+
+                    <div class="stats-comparison-kpis" aria-label="Resume de la comparaison">
+                        <div class="sales"><span>Ventes cumulees</span><strong id="comparisonSalesTotal">0,0 DA</strong><small id="comparisonSalesTrend">0 points actifs</small></div>
+                        <div class="purchases"><span>Achats cumules</span><strong id="comparisonPurchaseTotal">0,0 DA</strong><small id="comparisonPurchaseTrend">0 points actifs</small></div>
+                        <div class="gap"><span>Ecart net</span><strong id="comparisonNetGap">0,0 DA</strong><small id="comparisonGapStatus">Equilibre</small></div>
+                        <div class="ratio"><span>Ratio achats / ventes</span><strong id="comparisonPurchaseRatio">0%</strong><small>Part du CA absorbee</small></div>
+                    </div>
+
+                    <div class="stats-chart-toolbar">
+                        <div class="stats-chart-legend" role="group" aria-label="Series du graphique">
+                            <button class="stats-legend-toggle active" type="button" data-dataset-index="0" aria-pressed="true" onclick="toggleStatsComparisonDataset(0, this)"><span class="stats-legend-dot sales"></span>Ventes</button>
+                            <button class="stats-legend-toggle active" type="button" data-dataset-index="1" aria-pressed="true" onclick="toggleStatsComparisonDataset(1, this)"><span class="stats-legend-dot purchases"></span>Achats</button>
+                        </div>
+                        <span class="stats-chart-unit">Montants en DA</span>
+                    </div>
+
+                    <div class="stats-chart-shell">
+                        <canvas id="withdrawalsProfitChart" aria-label="Comparaison des achats et des ventes"></canvas>
+                    </div>
+
+                    <footer class="stats-comparison-insight" id="comparisonInsight">
+                        <span class="stats-insight-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.74V18h8v-3.26A7 7 0 0 0 12 2Z"/><path d="M9 22h6M9 18h6"/></svg>
+                        </span>
+                        <p>Les indicateurs de comparaison apparaitront ici.</p>
+                    </footer>
+                </section>
 
                 <!-- Stock Adjustments -->
                 <div class="card">
